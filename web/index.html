@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <title>Мапа парафій Острозького повіту</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+    <style>
+      /* Ensure the map fills the whole viewport */
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+      .leaflet-popup-content, .leaflet-tooltip {
+        white-space: pre-wrap;
+      }
+    </style>
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      // Create the map with an initial center and zoom level
+      var map = L.map("map").setView([0, 0], 2);
+
+      // Define a custom icon
+      var customIcon = L.icon({
+        iconUrl: "img/church.png",  // Change this to the path of your icon image
+        iconSize: [32, 37],    // Size of the icon (width, height)
+        iconAnchor: [16, 37],  // Point of the icon which corresponds to marker's location
+        popupAnchor: [0, -28]  // Point from which the popup should open relative to the iconAnchor
+      });
+
+      // Add OpenStreetMap base layer
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+      }).addTo(map);
+
+      // Load the GeoJSON file
+      fetch("geodata/churches.geojson")
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          // Create a GeoJSON layer and add popups if a property "tooltip" exists
+          var geojsonLayer = L.geoJson(data, {
+            // Use pointToLayer to create markers with a custom icon
+            pointToLayer: function (feature, latlng) {
+              return L.marker(latlng, { icon: customIcon });
+            },
+            onEachFeature: function (feature, layer) {
+              if (feature.properties && feature.properties.tooltip) {
+                layer.bindPopup(feature.properties.tooltip);
+              }
+            },
+          }).addTo(map);
+
+          // Adjust the map view to the geojson bounds
+          map.fitBounds(geojsonLayer.getBounds());
+        })
+        .catch(function (error) {
+          console.error("Error loading GeoJSON:", error);
+        });
+    </script>
+  </body>
+</html>
