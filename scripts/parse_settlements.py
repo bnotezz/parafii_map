@@ -7,29 +7,20 @@ except ImportError:
     raise
 
 # Load the document
-doc = Document("../data/source/Географічний покажчик до населених пунктів до Каталогу метричних книг.docx")
+doc = Document("data/source/Географічний покажчик до населених пунктів до Каталогу метричних книг.docx")
 
 def parse_location(text):
-    patterns = [
-        # Case: "с. Миротин, Рівненська обл., Здолбунівський р-н"
-        # Case: "Вежиця, с., Рівненська обл., Рокитнівський р-н"
-        r"^(?:с\.\s*)?(?P<name>[^,]+),\s*(?:с\.|смт|м\.|м,)?\s*,?\s*(?P<oblast>\S+)\s+обл\.,\s*(?P<rayon>\S+)\s+р-н$",
+    pattern = r"^(?:с\.|смт|с-ще|м\.|м,)?\s*(?P<name>[^,]+),\s*(?:с\.|смт|с-ще|м\.|м,)?\s*,?\s*(?P<oblast>\S+)\s+обл\.(?:,\s*(?P<rayon>\S+)\s+р-н)?$"
+    match = re.match(pattern, re.sub(r'\s+', ' ', text.strip()))
+    if match:
+        location = {
+            "name": match.group("name").strip(),
+            "oblast": match.group("oblast").strip()
+        }
+        if match.group("rayon"):
+            location["rayon"] = match.group("rayon").strip()
+        return location
 
-        # Case: "смт Олика, Волинська обл., Ківерцівський р-н"
-        r"^(?:с\.|смт|м\.|м,)?\s*(?P<name>[^,]+),\s*(?P<oblast>\S+)\s+обл\.,\s*(?P<rayon>\S+)\s+р-н$",
-
-        # Case: "м. Рівне, Рівненська обл."
-        r"^(?:с\.|смт|м\.|м,)?\s*(?P<name>[^,]+),\s*(?P<oblast>\S+)\s+обл\.$"
-    ]
-    
-    for pattern in patterns:
-        match = re.match(pattern, text.strip())
-        if match:
-            return {
-                "name": match.group("name").strip(),
-                "oblast": match.group("oblast").strip(),
-                "rayon": match.group("rayon").strip() if "rayon" in match.groupdict() else None
-            }
     return None
 
 # Function to parse each line
@@ -43,7 +34,7 @@ def parse_settlement(line):
         removed = 0
         old_district = None
         if old_location:
-            if old_location.startswith(("с.", "смт", "м.", "м,")):
+            if old_location.startswith(("с.", "смт", "м.", "м,","с-ще,", "с-ще")):
                 old_location = f"{settlement_name}, {old_location}"
             if old_location.startswith("об’єднано з "):
                 merged = 1
@@ -60,6 +51,8 @@ def parse_settlement(line):
                 old_district = {
                     "title": old_location
                 }
+                print(f"Old district parsing failed for: {old_location}")
+
 
 
         settlement = {
@@ -87,9 +80,5 @@ for para in doc.paragraphs:
         parsed_settlements.append(parsed)
 
 # Save to JSON file
-with open("../data/parsed_settlements.json", "w", encoding="utf-8") as json_file:
+with open("data/parsed_settlements.json", "w", encoding="utf-8") as json_file:
     json.dump(parsed_settlements, json_file, ensure_ascii=False, indent=4)
-
-# Example output
-for settlement in parsed_settlements[:5]:
-    print(settlement)
