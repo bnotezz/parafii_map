@@ -1,54 +1,94 @@
 import json
 import time
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
+import requests
 
-# Create a geolocator instance with a custom user agent.
-geolocator = Nominatim(user_agent="settlements_geocoder")
+# Overpass API endpoint
+url = "http://overpass-api.de/api/interpreter"
 
-def geocode_location(query):
-    try:
-        location = geolocator.geocode(query)
-        if location:
-            # Return coordinates in [longitude, latitude] format.
-            return [location.longitude, location.latitude]
-    except GeocoderTimedOut:
-        # Wait and retry if a timeout occurs.
-        time.sleep(1)
-        return geocode_location(query)
-    return None
 
-def query_geocoder(*query:str):
-    for q in query:
-        print("Query: ", q)
-        coords = geocode_location(q)
-        if coords:
-            return coords
-    return None
+def chunk_list(data, chunk_size):
+    """Yield successive chunks of size chunk_size from data."""
+    for i in range(0, len(data), chunk_size):
+        yield data[i:i + chunk_size]
 
-# Load the JSON data
-with open('../data/parsed_settlements.json', 'r', encoding='utf-8') as f:
-    settlements = json.load(f)
+def find_nodes_by_osm_ids(osm_ids):
+    """
+    Find nodes by their OSM IDs using Overpass API.
+    """
+    # Ensure the list of IDs is not empty
+    if not osm_ids:
+        print("No OSM IDs provided.")
+        return []
+    
+    # Build the query string; note the comma-separated list of IDs
+    query = "[out:json];\nnode(id:{});\nout skel;".format(",".join(map(str, osm_ids)))
+    
+    # Make the request to Overpass API
+    response = requests.get(url, params={'data': query})
 
-# Iterate over each church entry and add the coordinates.
-for settlement in settlements:
-    # Skip if coordinates are already present.
-    if(settlement.get("coordinates")):
-        continue
-    old_district = settlement.get("old_district", {}).get("settlement", {}).get("old_district", {}).get("title", "").strip()
+    if response.status_code == 200:
+        data = response.json()
+        return data['elements']
+    else:
+        print("Error fetching data:", response.status_code)
+        return []
 
-    if old_district:
-        coords = query_geocoder(old_district)
-        if coords:
-            settlement["coordinates"] = coords
-            print("Coordinates: ", coords)
-        else:
-            print("Coordinates not found for query: ", old_district)
-            # In case no coordinates are found, you can set it to None or handle it as needed.
-            settlement["coordinates"] = None
+def update_settlements_locations(settlements):
+    """
+    Process a list of settlements in chunks, make an HTTP POST request for each chunk,
+    and update each settlement with the location data returned from the API.
+    
+    Args:
+        settlements (list): List of settlement names.
+        api_url (str): URL of the API endpoint to get location data.
+    
+    Returns:
+        list: List of dictionaries with updated settlement data.
+    """
+    updated_settlements = []
+    for group in chunk_list(settlements, 20):
+        # Prepare payload; adjust the key names if required by the API.
+        osm_ids = [settlement.get("osm_id") for settlement in group]
+        if not osm_ids:
+            print("No OSM IDs found in the group.")
+            continue
+        # Make the API call to get location data
+        nodes = find_nodes_by_osm_ids(osm_ids)
+        if not nodes:
+            print("No nodes found for the provided OSM IDs.")
+            continue
+        # Process the nodes to extract location data
+        for settlement in group:
+            settlement["location"] = None
+            # Check if the settlement has a corresponding node
+            for node in nodes:
+                if node and 'id' in node and str(node['id']) == settlement.get("osm_id"):
+                    # Extract the location data from the node
+                    settlement["location"] = [node['lon'], node['lat']]
+                    break
+            
+            if settlement["location"] is None:
+                print(f"No location found for settlement with OSM ID: {settlement.get('osm_id')}")
 
-# Write the updated data back to a new JSON file.
-with open('../data/parsed_settlements.json', 'w', encoding='utf-8') as f:
-    json.dump(settlements, f, ensure_ascii=False, indent=4)
+            updated_settlements.append(settlement)
 
-print("Updated JSON file saved as 'parsed_settlements.json'.")
+    return updated_settlements
+
+def main():
+    settlements_file = "data/settlements_locations.json"
+    output_file = "data/settlements_locations.json"
+
+    # Load settlements JSON data
+    with open(settlements_file, "r", encoding="utf-8") as f:
+        settlements = json.load(f)
+
+    updated_settlements = update_settlements_locations(settlements)
+
+    # Save updated settlements to a new JSON file
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(updated_settlements, f, ensure_ascii=False, indent=2)
+
+    print(f"Updated settlements with details code saved to {output_file}")
+
+if __name__ == "__main__":
+    main()

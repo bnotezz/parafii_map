@@ -1,0 +1,12 @@
+//find churches within 1000m of cities by osm_ids
+[out:json][timeout:25];
+node(id:146541158,337524419,337509542,1186506546,337522487,337514561,269665736,337506833,337520759)->.nodes;
+(
+  // Look for nodes with the church tags within 1000m of the starting node
+  node(around.nodes:1000)["amenity"="place_of_worship"]["religion"="christian"];
+  // Also include ways that might represent churches (with their center computed)
+  way(around.nodes:1000)["amenity"="place_of_worship"]["religion"="christian"];
+  // And relations if needed
+  relation(around.nodes:1000)["amenity"="place_of_worship"]["religion"="christian"];
+);
+out center;
