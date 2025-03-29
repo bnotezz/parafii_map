@@ -2,7 +2,7 @@ import csv
 import json
 
 # Mapping for type letters to full names
-TYPE_MAPPING = {"С": "село", "Щ": "селище", "Т": "смт", "М": "місто"}
+TYPE_MAPPING = {"С": "село","C": "село","X": "селище","X": "селище", "Щ": "селище", "Т": "селище","T": "селище", "М": "місто", "К": "місто","M": "місто", "K": "місто"}
 
 def normalize_text(text):
     """Basic normalization: strip and lowercase."""
@@ -49,7 +49,7 @@ def find_record_by_name(records, name):
             return rec
     return None
 
-def find_record_by_prefix_and_name(records, prefix, name):
+def find_record_by_prefix_and_name(records, prefix, name,type=None):
     """
     Search for a record in CSV records whose 'code' starts with the meaningful prefix
     (obtained by removing trailing zeros) and whose normalized primary name exactly matches.
@@ -59,6 +59,10 @@ def find_record_by_prefix_and_name(records, prefix, name):
     for rec in records:
         code = rec.get("TE", "")
         rec_primary = get_csv_primary_name(rec.get("NU", ""))
+        # Check if the record type matches the provided type (if any)
+        # If type is provided, check if it matches the record's type
+        if(type and rec.get("NP", "") != type):
+            continue
         if code.startswith(prefix) and normalize_text(rec_primary) == norm_name:
             return rec
     return None
@@ -110,7 +114,7 @@ def update_settlements(settlements, csv_records):
             print(f"Oblast record not found for: {norm_oblast} with title {title}")
             continue
 
-        oblast_code = oblast_rec.get("code", "")
+        oblast_code = oblast_rec.get("TE", "")
 
         # If rayon is provided, lookup rayon record (using cache)
         if norm_rayon:
@@ -133,20 +137,28 @@ def update_settlements(settlements, csv_records):
         # and matching the settlement name.
         settlement_rec = find_record_by_prefix_and_name(csv_records, prefix, settlement_name)
         if not settlement_rec:
-            oblast_settlement_rec = find_record_by_prefix_and_name(csv_records,oblast_code, settlement_name)
+             # If the settlement name contains "м.", try to find city it in oblast directly
+            # This is a workaround for cases where the settlement name is not found in the rayon.
+            oblast_settlement_rec = find_record_by_prefix_and_name(csv_records, oblast_code, settlement_name, "М" if "м." in title else None)
             if(oblast_settlement_rec):
-                if "м." in title:
-                    # If the settlement name contains "м.", try to find it in oblast directly.
-                    settlement_rec = oblast_settlement_rec
-                else:
-                    settlement_rec = oblast_settlement_rec
-                    #print(f"Settlement record ONLY found in oblast for: {settlement_name} with prefix: {oblast_code}, title {title}")
+                settlement_rec = oblast_settlement_rec
+                #print(f"Settlement record ONLY found in oblast for: {settlement_name} with prefix: {oblast_code}, title {title}")
 
         if settlement_rec:
             # Save the full KOATUU code and mapped type into old_district.
             old_district["koatuu"] = settlement_rec.get("TE", "")
+            katotth = settlement_rec.get("Код об’єкта Кодифікатора", "")
+
             type_letter = settlement_rec.get("NP", "")
             old_district["type"] = TYPE_MAPPING.get(type_letter, type_letter)
+
+            if(katotth):
+                new_district={'katotth':katotth}
+                new_type_letter = settlement_rec.get("Категорія об’єкта Кодифікатора", "")
+                new_district["type"] = TYPE_MAPPING.get(new_type_letter, type_letter)
+                settlement["new_district"] = new_district
+
+            
         else:
             print(f"Settlement record not found for: {settlement_name} with prefix: {prefix}, title {title}")
 
@@ -154,7 +166,7 @@ def update_settlements(settlements, csv_records):
 
 def main():
     settlements_file = "data/parsed_settlements.json"
-    koatuu_csv_file = "data/source/KOATUU_26112020.csv"
+    koatuu_csv_file = "data/source/Перехідна таблиця з КОАТУУ на Кодифікатор.csv"
     output_file = "data/settlements_locations.json"
 
     # Load settlements JSON data
