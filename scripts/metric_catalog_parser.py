@@ -6,10 +6,10 @@ import pdfplumber
 
 # Completely suppress all pdfplumber warnings
 logging.getLogger('pdfminer').setLevel(logging.ERROR)
-# More specific warning filters
 warnings.filterwarnings('ignore', category=UserWarning, message='.*CropBox.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*MediaBox.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*Viewing.*')
+
 
 def inflect_label(value: str, label: str) -> str:
     if label in ("povit", "rayon"):
@@ -18,16 +18,19 @@ def inflect_label(value: str, label: str) -> str:
         return re.sub(r"ої$", "а", value)
     return value
 
+
 def slugify(text: str) -> str:
     s = text.lower()
-    s = re.sub(r'[^a-z0-9\u0400-\u04FF]+', '-', s)
+    s = re.sub(r'[^a-z0-9Ѐ-ӿ]+', '-', s)
     return re.sub(r'-{2,}', '-', s).strip('-')
+
 
 def normalize_fond(raw: str) -> str:
     m = re.match(r'(.+?)\s*[–-]\s*(\d+)', raw)
     if m:
-        return f"{m.group(1).strip()} – {m.group(2)}"
+        return f"{m.group(1).strip()}–{m.group(2)}"
     return raw.strip()
+
 
 def parse_parafiya(pf: str, page: int, logger) -> dict:
     original = pf
@@ -66,56 +69,103 @@ def parse_parafiya(pf: str, page: int, logger) -> dict:
 
     return data
 
+
 def parse_segment(seg: str, page: int, fld: str, logger) -> dict:
-    """
-    Розбирає один метричний сегмент виду:
-      '1930–1935, 1937–1938: ф. Р – 740, оп. 9, спр. 157'
-    years = '1930–1935, 1937–1938'
-    """
+
+    # Split on first ':' only, to preserve commas in the year list
     if ':' not in seg:
         logger.warning(f"Can't split years/rest in '{seg}' (page {page})")
         return {}
-    raw_years, rest = seg.split(':', 1)
-    years = re.sub(r'\s*[–-]\s*', '–', raw_years.strip())
 
-    # fond
-    fond_m = re.search(r'ф\.?\s*([^\s,;]+)', rest, flags=re.IGNORECASE)
-    # opys
+    raw_years, rest = seg.split(':', 1)
+    raw_years = raw_years.strip()
+    rest     = rest.strip()
+
+    # Normalize dashes and preserve commas
+    years = re.sub(r'\s*[–-]\s*', '–', raw_years)
+    # Validate format: YYYY, YYYY–YYYY, or comma-separated thereof
+    yrs_pattern = r'^\d{4}(?:\s*[–-]\s*\d{4})?(?:\s*,\s*\d{4}(?:\s*[–-]\s*\d{4})?)*$'
+    if not re.match(yrs_pattern, years):
+        logger.warning(f"Invalid years format '{years}' in '{seg}' (page {page})")
+
+    fond_m = re.search(r'ф\.?\s*([^,;]+)', rest, flags=re.IGNORECASE)
     opys_m = re.search(r'оп\.?\s*(\d+)', rest, flags=re.IGNORECASE)
-    # book (спр.)
     book_m = re.search(r'спр\.?\s*(\d+)', rest, flags=re.IGNORECASE)
-    # fallback: last number if book_m missing
-    book_val = None
-    if not book_m and opys_m:
-        nums = re.findall(r'\b(\d+)\b', rest)
-        if nums:
-            last = nums[-1]
-            if last != opys_m.group(1):
-                book_val = last
 
     result = {"years": years}
     if fond_m:
-        result["fond"] = normalize_fond(fond_m.group(1))
+        result["fond"] = normalize_fond(fond_m.group(1).strip())
+
+    # determine opys_val
+    opys_val = None
     if opys_m:
-        result["opys"] = opys_m.group(1)
+        opys_val = opys_m.group(1)
+    else:
+        nums = re.findall(r'\b(\d+)\b', rest)
+        # remove fond number
+        if fond_m:
+            f_num = re.search(r'(\d+)', fond_m.group(1))
+            if f_num:
+                nums = [n for n in nums if n != f_num.group(1)]
+        # remove book number
+        if book_m:
+            nums = [n for n in nums if n != book_m.group(1)]
+        if nums:
+            opys_val = nums[0]
+    if opys_val:
+        result["opys"] = opys_val
+
+    # determine book_val
+    book_val = None
     if book_m:
-        result["book"] = book_m.group(1)
-    elif book_val:
+        book_val = book_m.group(1)
+    else:
+        nums2 = re.findall(r'\b(\d+)\b', rest)
+        if fond_m:
+            f_num = re.search(r'(\d+)', fond_m.group(1))
+            if f_num:
+                nums2 = [n for n in nums2 if n != f_num.group(1)]
+        if opys_val:
+            nums2 = [n for n in nums2 if n != opys_val]
+        if nums2:
+            book_val = nums2[-1]
+    if book_val:
         result["book"] = book_val
 
-    if not (fond_m and opys_m and (book_m or book_val)):
+    if not ("fond" in result and "opys" in result and "book" in result):
         logger.warning(f"Incomplete parse of '{seg}' → {result} (page {page}, field {fld})")
     return result
+
+
+def parse_parafiya_block(block,pnum, logger,METRIC_FIELDS,missing):
+    # Parse the parafiya block
+    pf_page = block.get("page", pnum)
+    pf = block.get("parafiya", "")
+    if pf:
+        block.update(parse_parafiya(pf, pf_page, logger))
+    for fld in METRIC_FIELDS:
+        raw_val = block.get(fld)
+        if not raw_val:
+            block.pop(fld, None)
+            continue
+        segs = [s.strip() for s in raw_val.split(";") if s.strip()]
+        parsed = [parse_segment(seg, pf_page, fld, logger) for seg in segs]
+        block[fld] = [item for item in parsed if item]
+    block["id"] = slugify(block.get("parafiya",""))
+    if missing:
+        logger.warning(f"Missing fields {sorted(missing)} in block starting on page {pf_page}")
+    return block
+
 
 def parse_pdf_catalog(pdf_path: str) -> list:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     logger = logging.getLogger(__name__)
 
     religions = {
-        "православ": "orthodox",
-        "римо-католиц": "roman_catholic",
-        "греко-католиц": "greek_catholic",
-        "лютеран": "lutheran",
+        "православ’я": "orthodox",
+        "римо-католицизм": "roman_catholic",
+        "греко-католицизм": "greek_catholic",
+        "лютеранство": "lutheran",
         "іудаїзм": "judaism"
     }
 
@@ -126,10 +176,10 @@ def parse_pdf_catalog(pdf_path: str) -> list:
     }
 
     record_field_map = {
-        "Книга шлюбних опитувань": "marriage_inquiries",
-        "Списки парафіян":         "parish_lists",
-        "Припинення шлюбу":        "marriage_terminations",
-        "Шлюбні обшуки":           "marriage_inspections"
+        "Книга шлюбних опитувань":   "marriage_inquiries",
+        "Списки парафіян":           "parish_lists",
+        "Припинення шлюбу":          "marriage_terminations",
+        "Шлюбні обшуки":             "marriage_inspections"
     }
 
     METRIC_FIELDS = ["births", "marriages", "deaths", "divorces"] + list(record_field_map.values())
@@ -145,93 +195,82 @@ def parse_pdf_catalog(pdf_path: str) -> list:
         for page in pdf.pages:
             pnum = page.page_number
             text = page.extract_text() or ""
-            for raw in text.split("\n"):
+            lines = text.splitlines()
+            for raw in lines:
                 line = raw.strip()
-                if not line or line == str(pnum):
+                if line == str(pnum) or not line:
                     continue
 
-                # detect religion
                 low = line.lower()
-                for ukr, eng in religions.items():
-                    if ukr in low:
-                        current_religion = eng
-                        logger.info(f"Religion → {eng} (page {pnum})")
-                        break
-                else:
-                    m = re.match(r"^(\d+)\.\s*(.+)$", line)
-                    if m:
-                        idx, val = int(m.group(1)), m.group(2).strip()
-                        last_idx = idx
+
+                if not any(char.isdigit() for char in line):
+                    if last_idx == 10:
+                        # finalize the previous block
+                        pf_block = parse_parafiya_block(block, pnum, logger, METRIC_FIELDS, missing)
+                        if(pf_block):
+                            entries.append(pf_block)
+                        block = {}
+                        last_idx = None
                         last_record_field = None
 
-                        if idx == 1:
-                            block = {"religion": current_religion, "page": pnum}
-                            missing = set(key_map.keys())
+                    religion_record = False
+                    for ukr, eng in religions.items():
+                        if ukr.lower() == low:
+                            current_religion = eng
+                            logger.info(f"Religion → {eng} (page {pnum})")
+                            religion_record = True
+                            break
+                    
+                    if religion_record:
+                        continue
+                
+                m = re.match(r"^(\d+)\.\s*(.+)$", line)
+                if m:
+                    idx, val = int(m.group(1)), m.group(2).strip()
+                    if idx == 1 and last_idx == 10:
+                        # finalize the previous block
+                        pf_block = parse_parafiya_block(block, pnum, logger, METRIC_FIELDS, missing)
+                        if(pf_block):
+                            entries.append(pf_block)
+                        block = {}
+                        last_idx = None
+                        last_record_field = None
+                    last_idx = idx
+                    last_record_field = None
 
-                        if idx in key_map:
-                            if idx == 5:
-                                val = re.sub(r"^Народження:\s*", "", val)
-                            elif idx == 6:
-                                val = re.sub(r"^Шлюб:\s*", "", val)
-                            elif idx == 7:
-                                val = re.sub(r"^Розлучення:\s*", "", val)
-                            elif idx == 8:
-                                val = re.sub(r"^Смерть:\s*", "", val)
-                            if val and not val.lower().startswith("інформація відсутня"):
-                                block[key_map[idx]] = val
-                            missing.discard(idx)
+                    if idx == 1:
+                        block = {"religion": current_religion, "page": pnum}
+                        missing = set(key_map.keys())
 
-                        elif idx in (9, 10):
+                    if idx in key_map:
+                        if idx in (5,6,7,8):
+                            val = re.sub(r"^[^:]+:\s*", "", val)
+                        if val and not val.lower().startswith("інформація відсутня"):
+                            block[key_map[idx]] = val
+                        missing.discard(idx)
+
+                    elif idx in (9,10):
+                        if val and not val.lower().startswith("інформація відсутня"):
                             for ukr, eng in record_field_map.items():
                                 if val.startswith(ukr + ":"):
                                     content = val[len(ukr)+1:].strip()
-                                    if content and not content.lower().startswith("інформація відсутня"):
-                                        block[eng] = content
+                                    if content:
                                         last_record_field = eng
+                                        block[eng] = content
                                     break
-                            else:
-                                if not val.lower().startswith("інформація відсутня"):
-                                    logger.warning(f"Unparsed record idx={idx} p={pnum}: «{val}»")
-                        else:
-                            logger.warning(f"Unexpected idx={idx} p={pnum}: «{val}»")
-
-                        if idx == 10:
-                            pf = block.get("parafiya", "").strip()
-                            if not pf:
-                                logger.warning(f"Empty parafiya in block starting on page {pnum}")
-                            else:
-                                block.update(parse_parafiya(pf, pnum, logger))
-
-                            for fld in METRIC_FIELDS:
-                                raw = block.get(fld)
-                                if not raw:
-                                    block.pop(fld, None)
-                                    continue
-                                segs = [s.strip() for s in raw.replace('\n',' ').split(";") if s.strip()]
-                                parsed_list = []
-                                for seg in segs:
-                                    item = parse_segment(seg, pnum, fld, logger)
-                                    if item:
-                                        parsed_list.append(item)
-                                if parsed_list:
-                                    block[fld] = parsed_list
-                                else:
-                                    block.pop(fld, None)
-
-                            block["id"] = slugify(block.get("parafiya", ""))
-
-                            if missing:
-                                logger.warning(f"Missing fields {sorted(missing)} in block starting on page {pnum}")
-                            entries.append(block)
+                        elif last_idx == 10:
+                            # finalize the previous block
+                            pf_block = parse_parafiya_block(block, pnum, logger, METRIC_FIELDS, missing)
+                            if(pf_block):
+                                entries.append(pf_block)
                             block = {}
                             last_idx = None
                             last_record_field = None
-
-                    else:
-                        if last_idx in key_map and key_map[last_idx] in block:
-                            block[key_map[last_idx]] += " " + line
-                        elif last_record_field and last_record_field in block:
-                            block[last_record_field] += " " + line
+                else:
+                    if last_idx in key_map and key_map[last_idx] in block:
+                        block[key_map[last_idx]] += " " + line
+                    elif last_record_field and last_record_field in block:
+                        block[last_record_field] += " " + line
 
     return entries
 
