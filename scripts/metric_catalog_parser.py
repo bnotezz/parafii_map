@@ -3,6 +3,7 @@ import json
 import logging
 import warnings
 import pdfplumber
+import hashlib
 
 # Completely suppress all pdfplumber warnings
 logging.getLogger('pdfminer').setLevel(logging.ERROR)
@@ -10,9 +11,10 @@ warnings.filterwarnings('ignore', category=UserWarning, message='.*CropBox.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*MediaBox.*')
 warnings.filterwarnings('ignore', category=UserWarning, message='.*Viewing.*')
 
-
 def inflect_label(value: str, label: str) -> str:
-    if label in ("povit", "rayon"):
+    if label in ("church_settlement", "settlement"):
+        return re.sub(r'^(?:с\.|смт|с-ще|м\.|м,|м-ко)\.?\s*', "", value)
+    if label in ("povit"):
         return re.sub(r"ого$", "ий", value)
     if label in ("volost", "gmina"):
         return re.sub(r"ої$", "а", value)
@@ -24,6 +26,14 @@ def slugify(text: str) -> str:
     s = re.sub(r'[^a-z0-9Ѐ-ӿ]+', '-', s)
     return re.sub(r'-{2,}', '-', s).strip('-')
 
+def generate_short_id(text: str, length: int = 8) -> str:
+    """Generate a short unique ID based on input text using SHA-256"""
+    if not text:
+        return ""
+    # Create SHA-256 hash of the input text
+    hash_object = hashlib.sha256(text.encode())
+    # Take first 'length' characters of the hexadecimal representation
+    return hash_object.hexdigest()[:length]
 
 def normalize_fond(raw: str) -> str:
     m = re.match(r'(.+?)\s*[–-]\s*(\d+)', raw)
@@ -53,7 +63,7 @@ def parse_parafiya(pf: str, page: int, logger) -> dict:
     data = {"church": church}
     kind = tokens[j].lower()
     settlement = " ".join(tokens[: j-1])
-    data["church_settlement"] = settlement.strip()
+    data["church_settlement"] = inflect_label(settlement.strip(),"church_settlement")
     raw_label = tokens[j-1]
 
     if kind.startswith("повіт"):
@@ -64,8 +74,6 @@ def parse_parafiya(pf: str, page: int, logger) -> dict:
                 data["volost"] = inflect_label(region_raw, "volost")
             elif "гмін" in kind2:
                 data["gmina"] = inflect_label(region_raw, "gmina")
-    elif kind.startswith("район"):
-        data["rayon"] = inflect_label(raw_label, "rayon")
 
     return data
 
@@ -151,9 +159,21 @@ def parse_parafiya_block(block,pnum, logger,METRIC_FIELDS,missing):
         segs = [s.strip() for s in raw_val.split(";") if s.strip()]
         parsed = [parse_segment(seg, pf_page, fld, logger) for seg in segs]
         block[fld] = [item for item in parsed if item]
-    block["id"] = slugify(block.get("parafiya",""))
+
+    #block["id"] = slugify(block.get("parafiya",""))
+    block["id"] = generate_short_id(block.get("parafiya", ""))
+
     if missing:
         logger.warning(f"Missing fields {sorted(missing)} in block starting on page {pf_page}")
+
+    # validate the block
+    if not block.get("church_settlement"):
+        logger.warning(f"Missing church_settlement in block starting on page {pf_page}")
+    if not block.get("povit"):
+        logger.warning(f"Missing povit in block starting on page {pf_page}")
+    if not block.get("id"):
+        logger.warning(f"Missing id in block starting on page {pf_page}")
+
     return block
 
 
@@ -279,6 +299,54 @@ if __name__ == "__main__":
     output_json = "data/catalog.json"
 
     catalog = parse_pdf_catalog(input_pdf)
+    # Validate the catalog
+    # Check if id is unique
+    ids = set()
+    for entry in catalog:
+        if "id" in entry:
+            if entry["id"] in ids:
+                print(f"Duplicate id found: {entry['id']}")
+            else:
+                ids.add(entry["id"])
+        else:
+            print(f"Missing id in entry: {entry}")
+
+    # Log unieque territory, church_settlement, povit, volost, gmina
+    # unique_teritories = set()
+    # unique_church_settlements = set()
+    # unique_povits = set()
+    # unique_volosts = set()
+    # unique_gminas = set()
+    # for entry in catalog:
+    #     territory = entry.get("territory")
+    #     church_settlement = entry.get("church_settlement")
+    #     povit = entry.get("povit")
+    #     volost = entry.get("volost")    
+    #     gmina = entry.get("gmina")
+
+    #     if territory:
+    #         unique_teritories.add(territory)
+    #     if church_settlement:
+    #         unique_church_settlements.add(church_settlement)
+    #     if povit:
+    #         unique_povits.add(povit)
+    #     if volost:
+    #         unique_volosts.add(volost)
+    #     if gmina:
+    #         unique_gminas.add(gmina)
+    # print(f"Unique territories: {len(unique_teritories)}")
+    # print(sorted(unique_teritories))
+    # print(f"Unique church settlements: {len(unique_church_settlements)}")      
+    # print(f"Unique povits: {len(unique_povits)}")
+    # print(sorted(unique_povits))
+    # print(f"Unique volosts: {len(unique_volosts)}")
+    # print(sorted(unique_volosts))
+    # print(f"Unique gminas: {len(unique_gminas)}")
+    # print(sorted(unique_gminas))
+    # Log the number of entries in the catalog
+    print(f"Number of entries in the catalog: {len(catalog)}")
+
+    # Save the catalog to a JSON file
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
 
