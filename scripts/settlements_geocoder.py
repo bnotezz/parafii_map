@@ -59,7 +59,7 @@ def update_settlements_locations(settlements):
             continue
         # Process the nodes to extract location data
         for settlement in group:
-            settlement["location"] = None
+            #settlement["location"] = None
             # Check if the settlement has a corresponding node
             for node in nodes:
                 if node and 'id' in node and str(node['id']) == settlement.get("osm_id"):
@@ -67,7 +67,7 @@ def update_settlements_locations(settlements):
                     settlement["location"] = [node['lon'], node['lat']]
                     break
             
-            if settlement["location"] is None:
+            if not settlement.get("location"):
                 print(f"No location found for settlement with OSM ID: {settlement.get('osm_id')}")
 
             updated_settlements.append(settlement)
