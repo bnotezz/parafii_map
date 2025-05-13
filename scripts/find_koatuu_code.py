@@ -95,6 +95,7 @@ def update_settlements(settlements, csv_records):
 
         # Extract raw fields
         title = old_district.get("title", "")
+        country = old_district.get("country", "")
         oblast_raw = old_district.get("oblast", "")
         rayon_raw = old_district.get("rayon", "")
         settlement_name = old_district.get("name", "").strip()
@@ -102,6 +103,9 @@ def update_settlements(settlements, csv_records):
         # Normalize oblast and rayon names for matching
         norm_oblast = normalize_oblast(oblast_raw)
         norm_rayon = normalize_rayon(rayon_raw) if rayon_raw else None
+
+        if country and "україна" not in country.lower():
+            continue
 
         # Lookup oblast record (using cache)
         if norm_oblast in oblast_cache:
@@ -179,10 +183,10 @@ def main():
     # Update settlements with matching KOATUU codes and types
     updated_settlements = update_settlements(settlements, csv_records)
 
-    # Filter only settlements that have a koatuu code in their old_district
+    # Filter only settlements that have a koatuu code in their old_district or OSM id 
     settlements_with_koatuu = [
         s for s in updated_settlements
-        if "koatuu" in s.get("old_district", {})
+        if "koatuu" in s.get("old_district", {}) or "osm_id" in s
     ]
 
 
