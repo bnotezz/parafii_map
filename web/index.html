@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
   <head>
-    <title>Мапа парафій Острозького повіту</title>
+    <title>Мапа парафій до метричних книг ДАРО</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Leaflet CSS -->
@@ -47,20 +47,20 @@
       }).addTo(map);
 
       // Load the GeoJSON file
-      fetch("geodata/churches.geojson")
+      fetch("geodata/parafii.geojson")
         .then(function (response) {
           return response.json();
         })
         .then(function (data) {
-          // Create a GeoJSON layer and add popups if a property "tooltip" exists
+          // Create a GeoJSON layer and add popups if a property "title" exists
           var geojsonLayer = L.geoJson(data, {
             // Use pointToLayer to create markers with a custom icon
             pointToLayer: function (feature, latlng) {
               return L.marker(latlng, { icon: customIcon });
             },
             onEachFeature: function (feature, layer) {
-              if (feature.properties && feature.properties.tooltip) {
-                layer.bindPopup(feature.properties.tooltip);
+              if (feature.properties && feature.properties.title) {
+                layer.bindPopup(feature.properties.title);
               }
             },
           }).addTo(map);
