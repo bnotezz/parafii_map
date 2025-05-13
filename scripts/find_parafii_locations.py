@@ -91,28 +91,47 @@ def build_parafii_locations(catalog_path, locations_path, output_path):
     with open(locations_path, 'r', encoding='utf-8') as f:
         locations = json.load(f)
 
-    result = []
+    features = []
     for entry in catalog:
         loc = match_entry(entry, locations)
         if loc is None:
             continue
-        result.append({
+        coords = loc['location']
+        if not coords:
+            # Skip entries without coordinates
+            logger.warning(f"No coordinates found for {entry['church_settlement']} (page {entry['page']})")
+            continue
+        
+        info = {
             'id': entry['id'],
-            'name': entry['parafiya'],
+            'title': entry['parafiya'],
             'religion': entry['religion'],
             'settlements': entry['settlements'],
-            'osm_id': loc.get('osm_id'),
-            'location': loc.get('location'),
-            'katotth': loc.get('new_district', {}).get('katotth')
+            'osm_id': loc.get('osm_id')
+        }
+       
+        features.append({
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": coords
+            },
+            "properties": info  # include all original properties
         })
 
+    # Build the GeoJSON FeatureCollection
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-    logger.info(f"Wrote {len(result)} records to {output_path}")
+        json.dump(geojson, f, ensure_ascii=False, indent=2)
+    logger.info(f"Wrote {len(features)} records to {output_path}")
 
 if __name__ == '__main__':
     build_parafii_locations(
         catalog_path='data/catalog.json',
         locations_path='data/settlements_locations.json',
-        output_path='data/parafii_locations.json'
+        output_path='data/parafii.geojson'
     )
