@@ -109,6 +109,12 @@ def build_parafii_locations(catalog_path, locations_path, output_path):
             'settlements': entry['settlements'],
             'osm_id': loc.get('osm_id')
         }
+
+        new_district = loc.get('new_district')    
+        if new_district:
+            info['location'] = f"{new_district['type']} {new_district['name']}, {new_district['rayon']}, {new_district['region']}"
+        else:
+            logger.warning(f"No new_district found for {entry['church_settlement']} (page {entry['page']})")
        
         features.append({
             "type": "Feature",
