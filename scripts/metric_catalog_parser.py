@@ -311,39 +311,7 @@ if __name__ == "__main__":
         else:
             print(f"Missing id in entry: {entry}")
 
-    # Log unieque territory, church_settlement, povit, volost, gmina
-    # unique_teritories = set()
-    # unique_church_settlements = set()
-    # unique_povits = set()
-    # unique_volosts = set()
-    # unique_gminas = set()
-    # for entry in catalog:
-    #     territory = entry.get("territory")
-    #     church_settlement = entry.get("church_settlement")
-    #     povit = entry.get("povit")
-    #     volost = entry.get("volost")    
-    #     gmina = entry.get("gmina")
-
-    #     if territory:
-    #         unique_teritories.add(territory)
-    #     if church_settlement:
-    #         unique_church_settlements.add(church_settlement)
-    #     if povit:
-    #         unique_povits.add(povit)
-    #     if volost:
-    #         unique_volosts.add(volost)
-    #     if gmina:
-    #         unique_gminas.add(gmina)
-    # print(f"Unique territories: {len(unique_teritories)}")
-    # print(sorted(unique_teritories))
-    # print(f"Unique church settlements: {len(unique_church_settlements)}")      
-    # print(f"Unique povits: {len(unique_povits)}")
-    # print(sorted(unique_povits))
-    # print(f"Unique volosts: {len(unique_volosts)}")
-    # print(sorted(unique_volosts))
-    # print(f"Unique gminas: {len(unique_gminas)}")
-    # print(sorted(unique_gminas))
-    # Log the number of entries in the catalog
+    
     print(f"Number of entries in the catalog: {len(catalog)}")
 
     # Save the catalog to a JSON file
