@@ -34,12 +34,21 @@
       var map = L.map("map").setView([0, 0], 2);
 
       // Define a custom icon
-      var customIcon = L.icon({
-        iconUrl: "img/church.png",  // Change this to the path of your icon image
-        iconSize: [32, 37],    // Size of the icon (width, height)
-        iconAnchor: [16, 37],  // Point of the icon which corresponds to marker's location
-        popupAnchor: [0, -28]  // Point from which the popup should open relative to the iconAnchor
-      });
+      // Function to create icons dynamically
+      function createIcon(iconUrl) {
+        return L.icon({
+          iconUrl: iconUrl,
+          iconSize: [32, 32],    // Size of the icon (width, height)
+          iconAnchor: [16, 37],  // Point of the icon which corresponds to marker's location
+          popupAnchor: [0, -28]  // Point from which the popup should open relative to the iconAnchor
+        });
+      }
+
+      // Define icons using the helper function
+      var orthodoxIcon = createIcon("img/orthodox.png");
+      var kostelIcon = createIcon("img/kostel.png");
+      var synagogueIcon = createIcon("img/synagogue.png");
+      var kirkjaIcon = createIcon("img/kirkja.png");
 
       // Add OpenStreetMap base layer
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -56,6 +65,27 @@
           var geojsonLayer = L.geoJson(data, {
             // Use pointToLayer to create markers with a custom icon
             pointToLayer: function (feature, latlng) {
+              religion = feature.properties.religion || "orthodox"; 
+              var customIcon;
+              switch (religion) {
+                case "orthodox":
+                  customIcon = orthodoxIcon;
+                  break;
+                case "greek_catholic":
+                  customIcon = kostelIcon;
+                  break;
+                case "roman_catholic":
+                  customIcon = kostelIcon;
+                  break;
+                case "judaism":
+                  customIcon = synagogueIcon;
+                  break;
+                case "lutheran":
+                  customIcon = kirkjaIcon;
+                  break;
+                default:
+                  customIcon = orthodoxIcon; // Default icon
+              }
               return L.marker(latlng, { icon: customIcon });
             },
             onEachFeature: function (feature, layer) {
