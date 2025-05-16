@@ -7,8 +7,8 @@ const GITHUB_API_BASE = "https://api.github.com";
 
 export default {
   // Викликається за Cron-тригером
-  async scheduled(event, env) {
-    event.waitUntil(handleSchedule(env));
+  async scheduled(event, env, context) {
+    context.waitUntil(handleSchedule(env));
   }
 };
 
