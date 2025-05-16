@@ -6,7 +6,7 @@ workers_dev = true                    # якщо пушити у worker.dev пі
 
 # Cron-тригер: 1-го та 15-го числа о 00:00 UTC
 [triggers]
-crons = ["0 0 1,15 * *","12 19 16 * * "]
+crons = ["0 0 1,15 * *"]
 
 [observability.logs]
 enabled = true
