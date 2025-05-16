@@ -6,6 +6,16 @@ const MAIN_URL = "https://rv.archives.gov.ua/ocifrovani-sprav?period=5&fund=5";
 const GITHUB_API_BASE = "https://api.github.com";
 
 export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    if (url.searchParams.get("runNow") === "1") {
+      // це виконується в контексті fetch — тому:
+      // або просто чекаємо, або використовуємо ctx.waitUntil
+      ctx.waitUntil(handleSchedule(env));
+      return new Response("Scheduled job queued", { status: 200 });
+    }
+    return new Response("OK", { status: 200 });
+  },
   // Викликається за Cron-тригером
   async scheduled(event, env, context) {
     context.waitUntil(handleSchedule(env));
@@ -57,7 +67,9 @@ async function handleSchedule(env) {
   const apiUrl = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
   const headers = {
     "Authorization": `Bearer ${GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json"
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "daro-parser-worker",
+    "Content-Type": "application/json"  
   };
 
   // Спроба отримати поточний файл
