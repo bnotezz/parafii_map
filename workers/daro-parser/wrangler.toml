@@ -1,0 +1,11 @@
+name = "daro-parser-worker"        # назва вашого Worker
+type = "javascript"
+workers_dev = true                    # якщо пушити у worker.dev піддомен
+
+# Cron-тригер: 1-го та 15-го числа о 00:00 UTC
+[[triggers.cron]]
+schedule = "0 0 1,15 * *"
+
+# Підключення до змінних середовища (секрети)
+[env.production]
+vars = { GITHUB_FILE_PATH = "data/fond_P720.json" }

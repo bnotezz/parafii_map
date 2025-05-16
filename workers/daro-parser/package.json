@@ -1,0 +1,11 @@
+{
+    "name": "daro-parser-worker",
+    "version": "1.0.0",
+    "scripts": {
+      "deploy": "wrangler publish --env production"
+    },
+    "devDependencies": {
+      "wrangler": "^3.0.0"
+    }
+  }
+  
