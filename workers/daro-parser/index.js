@@ -148,7 +148,7 @@ async function updateGithubFile(env, newContent) {
   }
 }
 
-f/**
+/**
  * Перетворює Unicode-рядок у Base64 правильно, через UTF-8.
  */
 function utf8ToBase64(str) {
