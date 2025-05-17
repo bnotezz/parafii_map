@@ -14,15 +14,6 @@ const BROWSER_HEADERS = {
 };
 
 export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    
-    if (url.searchParams.get("runNow") === "1") {
-      ctx.waitUntil(handleSchedule(env));
-      return new Response("Scheduled job queued", { status: 200 });
-    }
-    return new Response("OK", { status: 200 });
-  },
   // Викликається за Cron-тригером
   async scheduled(event, env, context) {
     context.waitUntil(handleSchedule(env));
@@ -49,8 +40,7 @@ async function handleSchedule(env) {
 
     // 4) Підготувати новий контент і оновити файл у GitHub
     const newContent = JSON.stringify(cases, null, 2);
-    await updateGithubFile(env, newContent);
-    console.log("GitHub file updated.");
+    await updateGithubFile(env, newContent,cases.length);
   } catch (err) {
     console.error("Error during parsing or updating:", err);
   }
@@ -94,7 +84,7 @@ async function parseCases(opysList) {
   return cases;
 }
 
-async function updateGithubFile(env, newContent) {
+async function updateGithubFile(env, newContent, casesCount) {
   const { GITHUB_REPO, GITHUB_TOKEN, GITHUB_BRANCH } = env;
   const GITHUB_FILE_PATH = "data/fond_P720.json";
   const encodedNew = utf8ToBase64(newContent);
@@ -122,15 +112,15 @@ async function updateGithubFile(env, newContent) {
   }
 
   if (oldContent !== null && oldContent === newContent) {
-    console.log("No changes – skipping update");
+    console.log("No changes – skipping update. Total cases: ", casesCount);
     return;
   }
 
   // Готуємо тіло для PUT-запиту
   const body = {
     message: sha
-      ? "chore: update fond_P720.json (automated)"
-      : "chore: create fond_P720.json (automated)",
+      ? `update fond_P720 Загалом: ${casesCount} справ`
+      : "created fond_P720.json",
     content: encodedNew,
     branch: GITHUB_BRANCH
   };
@@ -145,6 +135,9 @@ async function updateGithubFile(env, newContent) {
     const err = await putRes.text();
     console.error("GitHub update failed:", putRes.status, err);
     throw new Error("Failed to update GitHub file");
+  }
+  else {
+    console.log("GitHub file updated successfully. Total cases :", casesCount);
   }
 }
 
