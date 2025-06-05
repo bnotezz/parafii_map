@@ -2,6 +2,31 @@ import re
 import json
 import logging
 
+def settlemnts_stats(logger):
+    settlements_path = "data/settlements_locations.json"
+    with open(settlements_path, 'r', encoding='utf-8') as f:
+        settlements = json.load(f)
+
+    # Log the number of settlements
+    logger.info(f"Number of settlements: {len(settlements)}")
+
+    # Log the number of unique locations
+    unique_regions = set()
+    for settlement in settlements:
+        new_district = settlement.get("new_district")
+        if not new_district:
+            logger.warning(f"Settlement without new_district: {settlement.get('name', 'Unknown')}")
+            continue
+        region = new_district.get("region")
+        if region:
+            unique_regions.add(region)
+    
+    logger.info(f"Number of unique regions: {len(unique_regions)}")
+    # Log the unique regions
+    logger.info("Unique regions:")
+    for region in sorted(unique_regions):
+        logger.info(region)
+
 def catalog_stats(logger):
     catalog_path = "data/catalog.json"
     with open(catalog_path, 'r', encoding='utf-8') as f:
@@ -79,6 +104,9 @@ def parafii_geojson_stats(logger):
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
+
+    logger.info("Starting settlements statistics...")
+    settlemnts_stats(logger)
 
     logger.info("Starting catalog statistics...")
     catalog_stats(logger)
