@@ -2,6 +2,38 @@ import re
 import json
 import logging
 
+def geojson_stats(logger):  
+    geojson_path = "data/parafii.geojson"
+    with open(geojson_path, 'r', encoding='utf-8') as f:
+        geojson_data = json.load(f)
+
+    # Log the number of features in the geojson
+    logger.info(f"Number of features in the geojson: {len(geojson_data['features'])}")
+
+    # Log the number of unique locations
+    unique_locations = {}
+    for feature in geojson_data['features']:
+        feature_coordinates = feature.get("geometry", {}).get("coordinates")
+        # convert coordinates to a tuple for uniqueness
+        if feature_coordinates:
+            coords_tuple = tuple(feature_coordinates)
+            if coords_tuple not in unique_locations:
+                unique_locations[coords_tuple] = []
+            unique_locations[coords_tuple].append(feature)
+
+    logger.info(f"Number of unique locations: {len(unique_locations)}")
+    # Log the number of features with the same coordinates
+    non_unique_count = 0
+    for coords, features in unique_locations.items():
+        if len(features) > 1:
+            non_unique_count+=1
+            logger.info(f"Multiple features with the same coordinates {coords}: {len(features)}")
+            for feature in features:
+                logger.info(f"Feature ID: {feature['properties'].get('id', 'Unknown')} - Title: {feature['properties'].get('title', 'Unknown')}")
+
+    logger.info(f"Number of non-unique locations (multiple features with the same coordinates): {non_unique_count}")
+
+
 def settlemnts_stats(logger):
     settlements_path = "data/settlements_locations.json"
     with open(settlements_path, 'r', encoding='utf-8') as f:
@@ -113,6 +145,9 @@ def main():
 
     logger.info("Starting parafii geojson statistics...")
     parafii_geojson_stats(logger)
+
+    logger.info("Starting geojson statistics...")
+    geojson_stats(logger)
 
 if __name__ == "__main__":
     main()
