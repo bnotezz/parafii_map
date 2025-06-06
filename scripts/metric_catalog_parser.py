@@ -184,7 +184,9 @@ def parse_pdf_catalog(pdf_path: str) -> list:
     religions = {
         "православ’я": "orthodox",
         "римо-католицизм": "roman_catholic",
+        "римо – католицизм": "roman_catholic",
         "греко-католицизм": "greek_catholic",
+        "греко – католицизм": "greek_catholic",
         "лютеранство": "lutheran",
         "іудаїзм": "judaism"
     }
@@ -235,7 +237,7 @@ def parse_pdf_catalog(pdf_path: str) -> list:
 
                     religion_record = False
                     for ukr, eng in religions.items():
-                        if ukr.lower() == low:
+                        if ukr.lower() == low.strip():
                             current_religion = eng
                             logger.info(f"Religion → {eng} (page {pnum})")
                             religion_record = True
