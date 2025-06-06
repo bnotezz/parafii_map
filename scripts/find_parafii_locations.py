@@ -91,53 +91,56 @@ def build_parafii_locations(catalog_path, locations_path, output_path):
     with open(locations_path, 'r', encoding='utf-8') as f:
         locations = json.load(f)
 
-    features = []
+    parafii = []
+
     for entry in catalog:
         loc = match_entry(entry, locations)
         if loc is None:
+            # Skip entries that do not match any location
+            logger.warning(f"No matching location for {entry['church_settlement']}")
             continue
         coords = loc['location']
         if not coords:
             # Skip entries without coordinates
             logger.warning(f"No coordinates found for {entry['church_settlement']} (page {entry['page']})")
             continue
+
+        new_district = loc.get('new_district')    
+        if not new_district:
+            logger.warning(f"No new_district found for {entry['church_settlement']}")
         
+        old_district = loc.get('old_district')    
+        if not old_district:
+            logger.warning(f"No old_district found for {entry['church_settlement']}")
+       
+
         info = {
             'id': entry['id'],
             'title': entry['parafiya'],
+            'church': entry['church'],
+            'church_settlement': entry.get('church_settlement', ''),
             'religion': entry['religion'],
+            'territory': entry['territory'],
+            'povit': entry.get('povit', ''),
+            'volost': entry.get('volost', entry.get('gmina', '')),
             'settlements': entry['settlements'],
-            'osm_id': loc.get('osm_id')
+            'osm_id': loc.get('osm_id'),
+            'location': coords,
+            'old_district': loc.get('old_district', {}),
+            'new_district': loc.get('new_district', {}),
+            'historic_district': loc.get('historic_district', ''),
         }
 
-        new_district = loc.get('new_district')    
-        if new_district:
-            info['location'] = f"{new_district['type']} {new_district['name']}, {new_district['rayon']}, {new_district['region']}"
-        else:
-            logger.warning(f"No new_district found for {entry['church_settlement']} (page {entry['page']})")
-       
-        features.append({
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": coords
-            },
-            "properties": info  # include all original properties
-        })
+        parafii.append(info)
 
-    # Build the GeoJSON FeatureCollection
-    geojson = {
-        "type": "FeatureCollection",
-        "features": features
-    }
 
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(geojson, f, ensure_ascii=False, indent=2)
-    logger.info(f"Wrote {len(features)} records to {output_path}")
+        json.dump(parafii, f, ensure_ascii=False, indent=2)
+    logger.info(f"Wrote {len(parafii)} records to {output_path}")
 
 if __name__ == '__main__':
     build_parafii_locations(
         catalog_path='data/catalog.json',
         locations_path='data/settlements_locations.json',
-        output_path='data/parafii.geojson'
+        output_path='data/parafii_locations.json'
     )

@@ -12,6 +12,7 @@ SCRIPTS = [
     "find_settlements_details.py", #5
     "settlements_geocoder.py", #6
     "find_parafii_locations.py", #7
+    "export_parafii_to_geojson.py", #8
 ]
 
 def run(script_name):
