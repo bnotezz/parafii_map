@@ -4,12 +4,14 @@ import logging
 
 def geojson_stats(logger):  
     geojson_path = "data/parafii.geojson"
+    output_path = "data/duplicates.json"
     with open(geojson_path, 'r', encoding='utf-8') as f:
         geojson_data = json.load(f)
 
     # Log the number of features in the geojson
     logger.info(f"Number of features in the geojson: {len(geojson_data['features'])}")
 
+    duplicates = []
     # Log the number of unique locations
     unique_locations = {}
     for feature in geojson_data['features']:
@@ -27,12 +29,20 @@ def geojson_stats(logger):
     for coords, features in unique_locations.items():
         if len(features) > 1:
             non_unique_count+=1
-            logger.info(f"Multiple features with the same coordinates {coords}: {len(features)}")
+            logger.info(f"Multiple features with the same coordinates {coords}: {len(features)} OSM ID: {features[0]['properties'].get('osm_id', 'Unknown')}")
             for feature in features:
+                duplicates.append({
+                    'id': feature['properties'].get('id', 'Unknown'),
+                    'title': feature['properties'].get('title', 'Unknown'),
+                    'religion': feature['properties'].get('religion', 'Unknown'),
+                    'modern_settlement': feature['properties'].get('modern_settlement', 'Unknown'),
+                })
                 logger.info(f"Feature ID: {feature['properties'].get('id', 'Unknown')} - Title: {feature['properties'].get('title', 'Unknown')}")
 
     logger.info(f"Number of non-unique locations (multiple features with the same coordinates): {non_unique_count}")
-
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(duplicates, f, ensure_ascii=False, indent=2)
+    logger.info(f"Wrote {len(duplicates)} records to {output_path}")
 
 def settlemnts_stats(logger):
     settlements_path = "data/settlements_locations.json"
@@ -99,40 +109,6 @@ def catalog_stats(logger):
     #Log the number of entries in the catalog
     logger.info(f"Number of entries in the catalog: {len(catalog)}")
 
-
-def parafii_geojson_stats(logger):
-    geojson_path = "data/parafii.geojson"
-    with open(geojson_path, 'r', encoding='utf-8') as f:
-        parafii = json.load(f)
-
-    # Log the number of features in the geojson
-    logger.info(f"Number of features in the geojson: {len(parafii['features'])}")
-    # Log the number of unique locations
-    unique_locations = set()
-    # Hash map for unique locations by osm_id and list of fetures with the same osm_id
-    osm_id_map = {}
-    for feature in parafii['features']:
-        osm_id = feature.get("properties", {}).get("osm_id")
-        if osm_id:
-            feature_info = {
-                'id': feature['properties']['id'],
-                'location': feature['properties'].get('location',""),
-                'title': feature['properties']['title']
-            }
-            if osm_id not in osm_id_map:
-                osm_id_map[osm_id] = []
-            osm_id_map[osm_id].append(feature_info)
-
-    logger.info(f"Number of unique locations: {len(osm_id_map)}")
-
-    # Log the number of features with the same osm_id
-    for osm_id, features in osm_id_map.items():
-        if len(features) > 1:
-            logger.info(f"Multiple features with the same osm_id {osm_id}: {len(features)}")
-            for feature in features:
-                logger.info(f"Feature: {feature['location']} {feature['title']} (id: {feature['id']})")
-    
-
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
@@ -142,9 +118,6 @@ def main():
 
     logger.info("Starting catalog statistics...")
     catalog_stats(logger)
-
-    logger.info("Starting parafii geojson statistics...")
-    parafii_geojson_stats(logger)
 
     logger.info("Starting geojson statistics...")
     geojson_stats(logger)

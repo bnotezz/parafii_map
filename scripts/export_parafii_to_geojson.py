@@ -38,6 +38,7 @@ def export_parafii(locations_mapping_path, parafii_path, output_path):
             "type": "Feature",
             "properties": {
                 "id": parafia['id'],
+                "osm_id": parafia.get('osm_id', ''),
                 "title": parafia['title'],
                 'religion': parafia.get('religion', ''),
                 'settlements': parafia.get('settlements', '')
@@ -50,7 +51,7 @@ def export_parafii(locations_mapping_path, parafii_path, output_path):
 
         new_district = parafia.get('new_district')    
         if new_district:
-             feature['properties']["location"] = f"{new_district['type']} {new_district['name']}, {new_district['rayon']}, {new_district['region']}"
+             feature['properties']["modern_settlement"] = f"{new_district['type']} {new_district['name']}, {new_district['rayon']}, {new_district['region']}"
         else:
             logger.warning(f"No new_district found for {parafia['church_settlement']}")
        
