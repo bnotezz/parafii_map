@@ -30,7 +30,7 @@ async function handleSchedule(env) {
     const opysList = parseOpysList(html);
 
     // 3) Розпарсити справи з кожного опису
-    const cases = await parseCases(opisList);
+    const cases = await parseCases(opysList);
 
     // Log error and skip updating if no cases were parsed.
     if (cases.length === 0) {
