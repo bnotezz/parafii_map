@@ -51,6 +51,7 @@ def generate_tree_view(parafii_path):
         settlement_node['parafii'].append({
             "id": parafia['id'], 
             "title": parafia['title'],
+            "church_settlement": parafia['church_settlement'],
             "settlements": parafia['settlements'],
             "location": parafia['location'],
             "religion": parafia['religion']
