@@ -61,17 +61,17 @@ function parseOpysList(html) {
 async function parseCases(opysList) {
   const cases = [];
   const caseRegex = /<tr>\s*<td[^>]*>\s*(\d+)\s*<\/td>\s*<td[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?<p[^>]*>\s*([^<]+?)\s*<\/p>[\s\S]*?<\/a>/g;
-  for (const { opysNumber, opisUrl } of opysList) {
+  for (const { opysNumber, opysUrl } of opysList) {
     const caseHeaders = {
       ...BROWSER_HEADERS,
       Referer: MAIN_URL
     };
-    const res = await fetch(opisUrl, { headers: caseHeaders });
-    const opisHtml = await res.text();
+    const res = await fetch(opysUrl, { headers: caseHeaders });
+    const opysHtml = await res.text();
     let cMatch;
-    while ((cMatch = caseRegex.exec(opisHtml))) {
+    while ((cMatch = caseRegex.exec(opysHtml))) {
       const spravaNumber = cMatch[1].trim();
-      const pdfUrl = new URL(cMatch[2].trim(), opisUrl).href;
+      const pdfUrl = new URL(cMatch[2].trim(), opysUrl).href;
       const caseName = cMatch[3].trim();
       cases.push({
         opys: opysNumber,
