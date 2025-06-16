@@ -44,8 +44,8 @@ export async function generateMetadata({
 }: { params: { region: string; district: string } }): Promise<Metadata>{
   const { region,district } = await params
   
-  const regionName = region
-  const districtName = district
+  const regionName = decodeURIComponent(region)
+  const districtName = decodeURIComponent(district)
 
   const title = `Метричні книги - ${districtName}, ${regionName}`
   const description = `Перегляд метричних книг району ${districtName} регіону ${regionName} з архіву ДАРО`
@@ -73,8 +73,8 @@ export default async function DistrictPage({ params }: { params: { region: strin
 
     const { region,district } = await params
   
-    const decodedRegionName = region
-    const decodedDistrictName = district
+    const decodedRegionName = decodeURIComponent(region)
+    const decodedDistrictName = decodeURIComponent(district)
 
     // Знаходимо область за назвою
     const regionItem = data.find((r: any) => r.name === decodedRegionName)

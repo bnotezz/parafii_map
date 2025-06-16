@@ -13,11 +13,6 @@ function getTodayDate() {
   return new Date().toISOString().split("T")[0];
 }
 
-// Function to safely encode URI components
-function safeEncodeURIComponent(str) {
-  return encodeURIComponent(str).replace(/%20/g, '+');
-}
-
 // Function to generate sitemap XML content
 async function generateSitemap() {
   const parafiiTree = (
@@ -73,7 +68,7 @@ async function generateSitemap() {
   parafiiTree.forEach((region) => {
     if (region.name !== "Інші") {
       sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${safeEncodeURIComponent(region.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -83,7 +78,7 @@ async function generateSitemap() {
       // Add district pages
       region.districts.forEach((district) => {
         sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${safeEncodeURIComponent(region.name)}/${safeEncodeURIComponent(district.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}/${encodeURIComponent(district.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -93,7 +88,7 @@ async function generateSitemap() {
         // Add hromada pages
         district.hromadas.forEach((hromada) => {
           sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${safeEncodeURIComponent(region.name)}/${safeEncodeURIComponent(district.name)}/${safeEncodeURIComponent(hromada.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}/${encodeURIComponent(district.name)}/${encodeURIComponent(hromada.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

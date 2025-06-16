@@ -23,7 +23,6 @@ import { getReligionColor, getReligionLabel, getReligionIcon } from "@/lib/relig
 import { AdditionalResources } from "@/components/additional-resources"
 import { HierarchyBreadcrumbs } from "@/components/hierarchy-breadcrumbs"
 import { notFound } from "next/navigation"
-import { safeEncodeURIComponent } from "@/lib/url-utils"
 
 interface Parish {
   id: string
@@ -277,19 +276,19 @@ export default async function ParishPage({ params }: { params: { id: string } })
     if (parish.region_name && !parish.region_name.includes("Інші")) {
       breadcrumbItems.push({
         label: parish.region_name,
-        href: `/hierarchy/${safeEncodeURIComponent(parish.region_name)}`,
+        href: `/hierarchy/${encodeURIComponent(parish.region_name)}`,
       })
 
       if (parish.district_name) {
         breadcrumbItems.push({
           label: parish.district_name,
-          href: `/hierarchy/${safeEncodeURIComponent(parish.region_name)}/${safeEncodeURIComponent(parish.district_name)}`,
+          href: `/hierarchy/${encodeURIComponent(parish.region_name)}/${encodeURIComponent(parish.district_name)}`,
         })
 
         if (parish.hromada_name) {
           breadcrumbItems.push({
             label: parish.hromada_name,
-            href: `/hierarchy/${safeEncodeURIComponent(parish.region_name)}/${safeEncodeURIComponent(parish.district_name)}/${safeEncodeURIComponent(parish.hromada_name)}`,
+            href: `/hierarchy/${encodeURIComponent(parish.region_name)}/${encodeURIComponent(parish.district_name)}/${encodeURIComponent(parish.hromada_name)}`,
           })
         }
       }

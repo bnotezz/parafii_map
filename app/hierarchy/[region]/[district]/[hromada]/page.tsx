@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Church } from "lucide-react"
 import { HierarchyBreadcrumbs } from "@/components/hierarchy-breadcrumbs"
-import { safeDecodeURIComponent, safeEncodeURIComponent, normalizeForUrl } from "@/lib/url-utils"
 import { sortParishes } from "@/lib/sort-utils"
 import { ParishCard } from "@/components/parish-card"
 import { AdditionalResources } from "@/components/additional-resources"
@@ -32,9 +31,9 @@ export async function generateMetadata({
 }: { params: { region: string; district: string; hromada: string } }): Promise<Metadata> {
   const { region,district,hromada } = await params
   
-  const regionName = safeDecodeURIComponent(region)
-  const districtName = safeDecodeURIComponent(district)
-  const hromadaName = safeDecodeURIComponent(hromada)
+  const regionName = decodeURIComponent(region)
+  const districtName = decodeURIComponent(district)
+  const hromadaName = decodeURIComponent(hromada)
 
   const title = `Метричні книги - ${hromadaName}, ${districtName}, ${regionName}`
   const description = `Перегляд метричних книг громади ${hromadaName} району ${districtName} регіону ${regionName} з архіву ДАРО`
@@ -46,7 +45,7 @@ export async function generateMetadata({
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}/hierarchy/${region}/${(district)}/${(hromada)}`,
+          url: `${siteConfig.url}/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}/${encodeURIComponent(hromadaName)}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -99,7 +98,7 @@ export default async function HromadaPage({
     const decodedHromadaName = decodeURIComponent(hromada)
 
     // Знаходимо область
-    const regionItem = data.find((r: any) => normalizeForUrl(r.name) === decodedRegionName)
+    const regionItem = data.find((r: any) => r.name === decodedRegionName)
 
     if (!regionItem) {
       return notFound()
@@ -108,7 +107,7 @@ export default async function HromadaPage({
     const regionName = regionItem.name
 
     // Знаходимо район
-    const districtItem = regionItem.districts?.find((d: any) => normalizeForUrl(d.name) === decodedDistrictName)
+    const districtItem = regionItem.districts?.find((d: any) => d.name === decodedDistrictName)
 
     if (!districtItem) {
       return notFound()
@@ -117,7 +116,7 @@ export default async function HromadaPage({
     const districtName = districtItem.name
 
     // Знаходимо громаду
-    const hromadaItem = districtItem.hromadas?.find((h: any) => normalizeForUrl(h.name) === decodedHromadaName)
+    const hromadaItem = districtItem.hromadas?.find((h: any) => h.name === decodedHromadaName)
 
     if (!hromadaItem) {
       return notFound()
@@ -153,11 +152,11 @@ export default async function HromadaPage({
     const breadcrumbItems = [
       {
         label: regionName,
-        href: `/hierarchy/${safeEncodeURIComponent(regionName)}`,
+        href: `/hierarchy/${encodeURIComponent(regionName)}`,
       },
       {
         label: districtName,
-        href: `/hierarchy/${safeEncodeURIComponent(regionName)}/${safeEncodeURIComponent(districtName)}`,
+        href: `/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}`,
       },
       { label: hromadaName },
     ]
@@ -176,7 +175,7 @@ export default async function HromadaPage({
 
           <div className="max-w-5xl mx-auto space-y-6">
             <Button asChild variant="outline" className="mb-6">
-              <Link href={`/hierarchy/${safeEncodeURIComponent(regionName)}/${safeEncodeURIComponent(districtName)}`} className="flex items-center gap-2">
+              <Link href={`/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}`} className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Повернутися до громад
               </Link>
