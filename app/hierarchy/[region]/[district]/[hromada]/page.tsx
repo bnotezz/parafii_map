@@ -9,7 +9,7 @@ import { notFound } from "next/navigation"
 import { Metadata } from 'next'
 import { siteConfig } from "@/lib/env"
 import { sharedMetadata } from '@/shared/metadata'
-import { getHierarchyUrl, normalizeForUrl, safeDecodeURIComponent, safeDeNormalizeURIComponent } from "@/lib/url-utils"
+import { getHierarchyUrl, normalizeForUrl} from "@/lib/url-utils"
 interface Parish {
   id: string
   title: string
@@ -31,10 +31,12 @@ export async function generateMetadata({
   params,
 }: { params: { region: string; district: string; hromada: string } }): Promise<Metadata> {
   const { region,district,hromada } = await params
-  
-  const regionName = safeDeNormalizeURIComponent(region)
-  const districtName = safeDeNormalizeURIComponent(district)
-  const hromadaName = safeDeNormalizeURIComponent(hromada)
+
+  const [regionItem, districtItem, hromadaItem] = await findRegionAndHromada(region, district,hromada)
+
+  const regionName = regionItem?.name ?? ""
+  const districtName = districtItem?.name ?? ""
+  const hromadaName = hromadaItem?.name ?? ""
 
   const title = `Метричні книги - ${hromadaName}, ${districtName}, ${regionName}`
   const description = `Перегляд метричних книг громади ${hromadaName} району ${districtName} регіону ${regionName} з архіву ДАРО`
@@ -46,7 +48,7 @@ export async function generateMetadata({
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}${getHierarchyUrl(regionName,districtName,hromadaName)}`,
+          url: `${siteConfig.url}/hierarchy/${region}/${districtName}/${hromadaName}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -84,45 +86,47 @@ export async function generateStaticParams(): Promise<PageParams[]> {
   }
 }
 
+async function findRegionAndHromada(
+      regionSlug: string,
+      districtSlug: string,
+      hromadaSlug: string
+    ): Promise<[any, any, any]> {
+
+      const data = await import("@/data/parafii_tree.json").then((module) => module.default)
+      const region = data.find((r) => normalizeForUrl(r.name) === regionSlug)
+      if (!region) return [undefined, undefined, undefined]
+      const district = region.districts?.find((d: any) => normalizeForUrl(d.name) === districtSlug)
+      if (!district) return [region, undefined, undefined]
+      const hromada = district.hromadas?.find((h: any) => normalizeForUrl(h.name) === hromadaSlug)
+
+      return [region, district, hromada]
+    }
+
 export default async function HromadaPage({
   params
 }: {
   params: PageParams
 }) {
   try {
-    const data = await import("@/data/parafii_tree.json").then((module) => module.default)
-
     const { region,district,hromada } = await params
   
-    const decodedRegionName = safeDecodeURIComponent(region)
-    const decodedDistrictName = safeDecodeURIComponent(district)
-    const decodedHromadaName = safeDecodeURIComponent(hromada)
+    const [regionItem, districtItem, hromadaItem] = await findRegionAndHromada(region, district,hromada)
 
-    // Знаходимо область
-    const regionItem = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(decodedRegionName))
-
+    
     if (!regionItem) {
-      console.error("Region not found:", decodedRegionName)
+      console.error("Region not found:", region)
       return notFound()
     }
 
     const regionName = regionItem.name
-
-    // Знаходимо район
-    const districtItem = regionItem.districts?.find((d: any) => normalizeForUrl(d.name) === normalizeForUrl(decodedDistrictName))
-
     if (!districtItem) {
-      console.error("District not found:", decodedDistrictName)
+      console.error("District not found:", district)
       return notFound()
     }
 
     const districtName = districtItem.name
-
-    // Знаходимо громаду
-    const hromadaItem = districtItem.hromadas?.find((h: any) => normalizeForUrl(h.name) === normalizeForUrl(decodedHromadaName))
-
     if (!hromadaItem) {
-      console.error("Hromada not found:", decodedHromadaName)
+      console.error("Hromada not found:", hromada)
       return notFound()
     }
 

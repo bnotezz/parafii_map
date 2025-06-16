@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { baseUrl } from '../lib/env.cjs';
+import { toSlug as slugify } from '../lib/slug.js'; 
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -11,9 +12,6 @@ const __dirname = dirname(__filename);
 // Function to get today's date in YYYY-MM-DD format
 function getTodayDate() {
   return new Date().toISOString().split("T")[0];
-}
-function normalizeForUrl(str){
-  return encodeURIComponent(str.replace(" ","-"));
 }
 
 // Function to generate sitemap XML content
@@ -71,7 +69,7 @@ async function generateSitemap() {
   parafiiTree.forEach((region) => {
     if (region.name !== "Інші") {
       sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${slugify(region.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -81,7 +79,7 @@ async function generateSitemap() {
       // Add district pages
       region.districts.forEach((district) => {
         sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}/${normalizeForUrl(district.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${slugify(region.name)}/${slugify(district.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -91,7 +89,7 @@ async function generateSitemap() {
         // Add hromada pages
         district.hromadas.forEach((hromada) => {
           sitemap += `  <url>
-     <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}/${normalizeForUrl(district.name)}/${normalizeForUrl(hromada.name)}</loc>
+     <loc>${baseUrl}/hierarchy/${slugify(region.name)}/${slugify(district.name)}/${slugify(hromada.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

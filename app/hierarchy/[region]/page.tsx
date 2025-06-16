@@ -7,7 +7,7 @@ import { sortByName } from "@/lib/sort-utils"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { siteConfig } from "@/lib/env"
-import { getHierarchyUrl,normalizeForUrl, safeDecodeURIComponent, safeDeNormalizeURIComponent } from "@/lib/url-utils"
+import { getHierarchyUrl,normalizeForUrl} from "@/lib/url-utils"
 import { sharedMetadata } from '@/shared/metadata'
 interface District {
   id: string
@@ -33,40 +33,41 @@ export async function generateStaticParams() {
   }
 }
 
-async function findRegion(regionName: string) {
+async function findRegion(regionNameSlug: string) {
     const data = await import("@/data/parafii_tree.json").then((module) => module.default)
 
-    console.log(`Looking for region:${regionName}. Normalized name: ${normalizeForUrl(regionName)}` )
-    console.log(
-      "Available regions:",
-      data.map((r: any) => `${r.name} (${normalizeForUrl(r.name)})`),
-    )
+    // console.log(`Looking for region: ${regionNameSlug}.` )
+    // console.log(
+    //   "Available regions:",
+    //   data.map((r: any) => `${r.name} (${normalizeForUrl(r.name)})`),
+    // )
 
-    const region = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(regionName))
+    const region = data.find((r: any) => normalizeForUrl(r.name) === regionNameSlug)
 
     return region
 }
 
 export async function generateMetadata({ params }: { params: { region: string } }): Promise<Metadata>{
   const { region } = await params
-  const regionName = safeDeNormalizeURIComponent(region)
+
+  const regionObj = await findRegion(region)
   
-  const title = `Метричні книги - ${regionName}`
-  const description = `Перегляд метричних книг регіону ${regionName} з архіву ДАРО`
+  const title = `Метричні книги - ${regionObj?.name ?? ""}`
+  const description = `Перегляд метричних книг регіону ${regionObj?.name ?? ""} з архіву ДАРО`
   
   return {
-        title:title,
-        description:description,
+        title: title,
+        description: description,
         openGraph: {
           ...sharedMetadata.openGraph,
-          title:title,
-          description:description,
-          url: `${siteConfig.url}${getHierarchyUrl(regionName)}`,
+          title: title,
+          description: description,
+          url: `${siteConfig.url}/hierarchy/${region}}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
-          title:title,
-          description:description,
+          title: title,
+          description: description,
         },
       }
 }
@@ -75,18 +76,16 @@ export default async function RegionPage({ params }: { params: { region: string 
   try {
     
     const { region } = await params
-    const decodedRegionName = safeDecodeURIComponent(region)
-
 
     // Перенаправляємо на окрему сторінку для області "Інші"
-    if (decodedRegionName === "Інші") {
+    if (region === "others") {
       return notFound()
     }
 
-    const regionItem = await findRegion(decodedRegionName)
+    const regionItem = await findRegion(region)
 
     if (!regionItem) {
-      console.error("Region not found:", decodedRegionName)
+      console.error("Region not found:", region)
       return notFound()
     }
 

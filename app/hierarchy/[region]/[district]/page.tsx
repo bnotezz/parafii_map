@@ -8,7 +8,7 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { siteConfig } from "@/lib/env"
 import { sharedMetadata } from '@/shared/metadata'
-import { getHierarchyUrl, safeDecodeURIComponent,normalizeForUrl, safeDeNormalizeURIComponent } from "@/lib/url-utils"
+import { getHierarchyUrl,normalizeForUrl } from "@/lib/url-utils"
 interface Hromada {
   id: string
   name: string
@@ -44,12 +44,10 @@ export async function generateMetadata({
   params,
 }: { params: { region: string; district: string } }): Promise<Metadata>{
   const { region,district } = await params
-  
-  const regionName = safeDeNormalizeURIComponent(region)
-  const districtName = safeDeNormalizeURIComponent(district)
+  const [regionItem, districtItem] = await findRegionAndDistrict(region, district)
 
-  const title = `Метричні книги - ${districtName}, ${regionName}`
-  const description = `Перегляд метричних книг району ${districtName} регіону ${regionName} з архіву ДАРО`
+  const title = `Метричні книги - ${regionItem?.name ?? ""}, ${districtItem?.name??""}`
+  const description = `Перегляд метричних книг району ${districtItem?.name??""} регіону ${regionItem?.name??""} з архіву ДАРО`
 
   return {
         title:title,
@@ -58,7 +56,7 @@ export async function generateMetadata({
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}${getHierarchyUrl(regionName,districtName)}`,
+          url: `${siteConfig.url}/hierarchy/${region}/${district})}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -68,33 +66,33 @@ export async function generateMetadata({
       }
 }
 
+async function findRegionAndDistrict(
+      regionSlug: string,
+      districtSlug: string
+    ): Promise<[any, any]> {
+
+      const data = await import("@/data/parafii_tree.json").then((module) => module.default)
+      const region = data.find((r) => normalizeForUrl(r.name) === regionSlug)
+      if (!region) return [undefined, undefined]
+      const district = region.districts?.find((d: any) => normalizeForUrl(d.name) === districtSlug)
+      return [region, district]
+    }
+
 export default async function DistrictPage({ params }: { params: { region: string; district: string } }) {
   try {
-    const data = await import("@/data/parafii_tree.json").then((module) => module.default)
-
     const { region,district } = await params
-  
-    const decodedRegionName = safeDecodeURIComponent(region)
-    const decodedDistrictName = safeDecodeURIComponent(district)
 
-    // Знаходимо область за назвою
-    const regionItem = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(decodedRegionName))
-
+    const [regionItem, districtItem] = await findRegionAndDistrict(region, district)
     if (!regionItem) {
-      console.error("Region not found:", decodedRegionName)
+      console.error("Region not found:", region)
+      return notFound()
+    }
+    if (!districtItem) {
+      console.error("District not found:", district)
       return notFound()
     }
 
     const regionName = regionItem.name
-
-    // Знаходимо район за назвою
-    const districtItem = regionItem.districts?.find((d: any) => normalizeForUrl(d.name) === normalizeForUrl(decodedDistrictName))
-
-    if (!districtItem) {
-      console.error("District not found:", decodedDistrictName)
-      return notFound()
-    }
-
     const districtName = districtItem.name
     const sortedHromadas = sortByName(districtItem.hromadas || [])
 
