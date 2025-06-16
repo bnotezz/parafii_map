@@ -68,9 +68,9 @@ export async function generateStaticParams(): Promise<PageParams[]> {
         region.districts?.forEach((district: any) => {
           district.hromadas?.forEach((hromada: any) => {
             params.push({
-              region: safeEncodeURIComponent(region.name),
-              district: safeEncodeURIComponent(district.name),
-              hromada: safeEncodeURIComponent(hromada.name),
+              region: encodeURIComponent(region.name),
+              district: encodeURIComponent(district.name),
+              hromada: encodeURIComponent(hromada.name),
             })
           })
         })
@@ -94,9 +94,9 @@ export default async function HromadaPage({
 
     const { region,district,hromada } = await params
   
-    const decodedRegionName = normalizeForUrl(safeDecodeURIComponent(region))
-    const decodedDistrictName = normalizeForUrl(safeDecodeURIComponent(district))
-    const decodedHromadaName = normalizeForUrl(safeDecodeURIComponent(hromada))
+    const decodedRegionName = decodeURIComponent(region)
+    const decodedDistrictName = decodeURIComponent(district)
+    const decodedHromadaName = decodeURIComponent(hromada)
 
     // Знаходимо область
     const regionItem = data.find((r: any) => normalizeForUrl(r.name) === decodedRegionName)

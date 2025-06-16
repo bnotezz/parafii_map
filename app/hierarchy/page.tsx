@@ -128,11 +128,10 @@ export default async function HierarchyPage() {
                 <CardContent className="pt-0 flex justify-end">
                   <Button asChild size="sm">
                     <Link
-                      href={
-                        region.name === "Інші" ? "/hierarchy/others" : `/hierarchy/${encodeURIComponent(region.name)}`
-                      }
-                      className="flex items-center gap-2"
-                    >
+                       href={{
+                              pathname: region.name === "Інші"?"/hierarchy/others":`/hierarchy/${encodeURIComponent(region.name)}`,
+                            }}
+                      className="flex items-center gap-2">
                       <span>{region.name === "Інші" ? "Переглянути парафії" : "Переглянути райони"}</span>
                       <ArrowRight className="h-4 w-4" />
                     </Link>

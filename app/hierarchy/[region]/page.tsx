@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Building2, ArrowRight } from "lucide-react"
 import { HierarchyBreadcrumbs } from "@/components/hierarchy-breadcrumbs"
-import { safeDecodeURIComponent,safeEncodeURIComponent, normalizeForUrl } from "@/lib/url-utils"
 import { sortByName } from "@/lib/sort-utils"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
@@ -28,7 +27,7 @@ export async function generateStaticParams() {
     return data
       .filter((region: any) => !region.name.includes("Інші"))
       .map((region: any) => {
-        const encodedName = safeEncodeURIComponent(region.name)
+        const encodedName = encodeURIComponent(region.name)
         //console.log(`Region: ${region.name} -> ${encodedName}`)
         return {
           region: encodedName,
@@ -43,14 +42,14 @@ export async function generateStaticParams() {
 async function findRegion(decodedRegionName: string) {
     const data = await import("@/data/parafii_tree.json").then((module) => module.default)
 
-    const region = data.find((r: any) => normalizeForUrl(r.name) === decodedRegionName)
+    const region = data.find((r: any) => r.name === decodedRegionName)
 
     return region
 }
 
 export async function generateMetadata({ params }: { params: { region: string } }): Promise<Metadata>{
   const { region } = await params
-  const regionName = safeDecodeURIComponent(region)
+  const regionName = decodeURIComponent(region)
   
   const title = `Метричні книги - ${regionName}`
   const description = `Перегляд метричних книг регіону ${regionName} з архіву ДАРО`
@@ -76,7 +75,7 @@ export default async function RegionPage({ params }: { params: { region: string 
   try {
     
     const { region } = await params
-    const decodedRegionName = safeDecodeURIComponent(region)
+    const decodedRegionName = decodeURIComponent(region)
     //console.log("Looking for region:", decodedRegionName)
     // console.log(
     //   "Available regions:",
@@ -147,7 +146,10 @@ export default async function RegionPage({ params }: { params: { region: string 
                     <CardContent className="pt-0 flex justify-end">
                       <Button asChild size="sm">
                         <Link
-                          href={`/hierarchy/${safeEncodeURIComponent(regionName)}/${safeEncodeURIComponent(district.name)}`}
+
+                          href={{
+                              pathname: `/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(district.name)}`,
+                            }}
                           className="flex items-center gap-2"
                         >
                           <span>Переглянути громади</span>

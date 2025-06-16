@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Users, ArrowRight } from "lucide-react"
 import { HierarchyBreadcrumbs } from "@/components/hierarchy-breadcrumbs"
-import { safeDecodeURIComponent, safeEncodeURIComponent, normalizeForUrl } from "@/lib/url-utils"
 import { sortByName } from "@/lib/sort-utils"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
@@ -26,8 +25,8 @@ export async function generateStaticParams() {
       if (!region.name.includes("Інші")) {
         region.districts?.forEach((district: any) => {
           params.push({
-            region: safeEncodeURIComponent(region.name),
-            district: safeEncodeURIComponent(district.name),
+            region: encodeURIComponent(region.name),
+            district: encodeURIComponent(district.name),
           })
         })
       }
@@ -45,8 +44,8 @@ export async function generateMetadata({
 }: { params: { region: string; district: string } }): Promise<Metadata>{
   const { region,district } = await params
   
-  const regionName = safeDecodeURIComponent(region)
-  const districtName = safeDecodeURIComponent(district)
+  const regionName = region
+  const districtName = district
 
   const title = `Метричні книги - ${districtName}, ${regionName}`
   const description = `Перегляд метричних книг району ${districtName} регіону ${regionName} з архіву ДАРО`
@@ -58,7 +57,7 @@ export async function generateMetadata({
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}/hierarchy/${region}/${district}`,
+          url: `${siteConfig.url}/hierarchy/${encodeURIComponent(region)}/${encodeURIComponent(district)}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -74,11 +73,11 @@ export default async function DistrictPage({ params }: { params: { region: strin
 
     const { region,district } = await params
   
-    const decodedRegionName = normalizeForUrl(safeDecodeURIComponent(region))
-    const decodedDistrictName = normalizeForUrl(safeDecodeURIComponent(district))
+    const decodedRegionName = region
+    const decodedDistrictName = district
 
     // Знаходимо область за назвою
-    const regionItem = data.find((r: any) => normalizeForUrl(r.name) === decodedRegionName)
+    const regionItem = data.find((r: any) => r.name === decodedRegionName)
 
     if (!regionItem) {
       return notFound()
@@ -87,7 +86,7 @@ export default async function DistrictPage({ params }: { params: { region: strin
     const regionName = regionItem.name
 
     // Знаходимо район за назвою
-    const districtItem = regionItem.districts?.find((d: any) => normalizeForUrl(d.name) === decodedDistrictName)
+    const districtItem = regionItem.districts?.find((d: any) => d.name === decodedDistrictName)
 
     if (!districtItem) {
       return notFound()
@@ -118,7 +117,11 @@ export default async function DistrictPage({ params }: { params: { region: strin
 
           <div className="max-w-4xl mx-auto space-y-6">
             <Button asChild variant="outline" className="mb-6">
-              <Link href={`/hierarchy/${safeEncodeURIComponent(regionName)}`} className="flex items-center gap-2">
+              <Link 
+                 href={{
+                              pathname: `/hierarchy/${encodeURIComponent(regionName)}`,
+                            }}
+                className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Повернутися до районів
               </Link>
@@ -151,8 +154,10 @@ export default async function DistrictPage({ params }: { params: { region: strin
                     <CardContent className="flex justify-end">
                       <Button asChild size="sm">
                         <Link
-                          href={`/hierarchy/${safeDecodeURIComponent(regionName)}/${safeEncodeURIComponent(districtName)}/${safeEncodeURIComponent(hromada.name)}`}
-                          className="flex items-center gap-2"
+                           href={{
+                              pathname: `/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}/${encodeURIComponent(hromada.name)}`,
+                            }}
+                            className="flex items-center gap-2"
                         >
                           <span>Переглянути населені пункти</span>
                           <ArrowRight className="h-4 w-4" />
