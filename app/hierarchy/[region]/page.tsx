@@ -36,6 +36,12 @@ export async function generateStaticParams() {
 async function findRegion(regionName: string) {
     const data = await import("@/data/parafii_tree.json").then((module) => module.default)
 
+    console.log(`Looking for region:${regionName}. Normalized name: ${normalizeForUrl(regionName)}` )
+    console.log(
+      "Available regions:",
+      data.map((r: any) => `${r.name} (${normalizeForUrl(r.name)})`),
+    )
+
     const region = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(regionName))
 
     return region
@@ -70,11 +76,7 @@ export default async function RegionPage({ params }: { params: { region: string 
     
     const { region } = await params
     const decodedRegionName = safeDecodeURIComponent(region)
-    //console.log("Looking for region:", decodedRegionName)
-    // console.log(
-    //   "Available regions:",
-    //   data.map((r: any) => r.name),
-    // )
+
 
     // Перенаправляємо на окрему сторінку для області "Інші"
     if (decodedRegionName === "Інші") {
