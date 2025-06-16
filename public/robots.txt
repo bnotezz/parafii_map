@@ -1,0 +1,15 @@
+# Allow all crawlers except specific paths
+User-agent: *
+Disallow: /search/
+Disallow: /api/
+Disallow: /admin/
+
+# Specifically block Yandex
+User-agent: Yandex
+User-agent: YandexBot
+User-agent: YandexImages
+User-agent: YandexMobileBot
+Disallow: /
+
+# Sitemap location
+Sitemap: ${baseUrl}/sitemap.xml

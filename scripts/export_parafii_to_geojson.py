@@ -2,7 +2,7 @@ import csv
 import json
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 def export_parafii(locations_mapping_path, parafii_path, output_path):
