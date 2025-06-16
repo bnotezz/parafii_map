@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-const { baseUrl, resolveBaseUrl } = require('./env.cjs');
+const { baseUrl, resolveBaseUrl} = require('./env.cjs');
 
 export const siteConfig = {
   name: "ДАРО - Каталог метричних книг",

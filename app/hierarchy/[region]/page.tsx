@@ -7,6 +7,7 @@ import { sortByName } from "@/lib/sort-utils"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { siteConfig } from "@/lib/env"
+import { getHierarchyUrl,normalizeForUrl, safeDecodeURIComponent, safeDeNormalizeURIComponent } from "@/lib/url-utils"
 import { sharedMetadata } from '@/shared/metadata'
 interface District {
   id: string
@@ -19,18 +20,11 @@ export async function generateStaticParams() {
   try {
     const data = await import("@/data/parafii_tree.json").then((module) => module.default)
 
-    // console.log(
-    //   "Generating static params for regions:",
-    //   data.map((r: any) => r.name),
-    // )
-
     return data
       .filter((region: any) => !region.name.includes("Інші"))
       .map((region: any) => {
-        const encodedName = encodeURIComponent(region.name)
-        //console.log(`Region: ${region.name} -> ${encodedName}`)
         return {
-          region: encodedName,
+          region: normalizeForUrl(region.name),
         }
       })
   } catch (error) {
@@ -39,17 +33,17 @@ export async function generateStaticParams() {
   }
 }
 
-async function findRegion(decodedRegionName: string) {
+async function findRegion(regionName: string) {
     const data = await import("@/data/parafii_tree.json").then((module) => module.default)
 
-    const region = data.find((r: any) => r.name === decodedRegionName)
+    const region = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(regionName))
 
     return region
 }
 
 export async function generateMetadata({ params }: { params: { region: string } }): Promise<Metadata>{
   const { region } = await params
-  const regionName = decodeURIComponent(region)
+  const regionName = safeDeNormalizeURIComponent(region)
   
   const title = `Метричні книги - ${regionName}`
   const description = `Перегляд метричних книг регіону ${regionName} з архіву ДАРО`
@@ -61,7 +55,7 @@ export async function generateMetadata({ params }: { params: { region: string } 
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}/hierarchy/${region}`,
+          url: `${siteConfig.url}${getHierarchyUrl(regionName)}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -75,7 +69,7 @@ export default async function RegionPage({ params }: { params: { region: string 
   try {
     
     const { region } = await params
-    const decodedRegionName = decodeURIComponent(region)
+    const decodedRegionName = safeDecodeURIComponent(region)
     //console.log("Looking for region:", decodedRegionName)
     // console.log(
     //   "Available regions:",
@@ -148,7 +142,7 @@ export default async function RegionPage({ params }: { params: { region: string 
                         <Link
 
                           href={{
-                              pathname: `/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(district.name)}`,
+                              pathname: getHierarchyUrl(regionName,district.name),
                             }}
                           className="flex items-center gap-2"
                         >

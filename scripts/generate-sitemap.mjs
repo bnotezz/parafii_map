@@ -12,6 +12,9 @@ const __dirname = dirname(__filename);
 function getTodayDate() {
   return new Date().toISOString().split("T")[0];
 }
+function normalizeForUrl(str){
+  return encodeURIComponent(str.replace(" ","-"));
+}
 
 // Function to generate sitemap XML content
 async function generateSitemap() {
@@ -68,7 +71,7 @@ async function generateSitemap() {
   parafiiTree.forEach((region) => {
     if (region.name !== "Інші") {
       sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -78,7 +81,7 @@ async function generateSitemap() {
       // Add district pages
       region.districts.forEach((district) => {
         sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}/${encodeURIComponent(district.name)}</loc>
+    <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}/${normalizeForUrl(district.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -88,7 +91,7 @@ async function generateSitemap() {
         // Add hromada pages
         district.hromadas.forEach((hromada) => {
           sitemap += `  <url>
-    <loc>${baseUrl}/hierarchy/${encodeURIComponent(region.name)}/${encodeURIComponent(district.name)}/${encodeURIComponent(hromada.name)}</loc>
+     <loc>${baseUrl}/hierarchy/${normalizeForUrl(region.name)}/${normalizeForUrl(district.name)}/${normalizeForUrl(hromada.name)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

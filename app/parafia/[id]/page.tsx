@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Metadata } from "next"
 import { siteConfig } from "@/lib/env"
+import { getHierarchyUrl } from "@/lib/url-utils"
 import { sharedMetadata } from '@/shared/metadata'
 import {
   MapPin,
@@ -276,19 +277,19 @@ export default async function ParishPage({ params }: { params: { id: string } })
     if (parish.region_name && !parish.region_name.includes("Інші")) {
       breadcrumbItems.push({
         label: parish.region_name,
-        href: `/hierarchy/${encodeURIComponent(parish.region_name)}`,
+        href: getHierarchyUrl(parish.region_name),
       })
 
       if (parish.district_name) {
         breadcrumbItems.push({
           label: parish.district_name,
-          href: `/hierarchy/${encodeURIComponent(parish.region_name)}/${encodeURIComponent(parish.district_name)}`,
+          href: getHierarchyUrl(parish.region_name,parish.district_name),
         })
 
         if (parish.hromada_name) {
           breadcrumbItems.push({
             label: parish.hromada_name,
-            href: `/hierarchy/${encodeURIComponent(parish.region_name)}/${encodeURIComponent(parish.district_name)}/${encodeURIComponent(parish.hromada_name)}`,
+            href: getHierarchyUrl(parish.region_name,parish.district_name,parish.hromada_name),
           })
         }
       }

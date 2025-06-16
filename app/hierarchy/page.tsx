@@ -6,6 +6,7 @@ import { MapPin, Users, AlertCircle, ArrowRight } from "lucide-react"
 import { sortRegions } from "@/lib/sort-utils"
 import { siteConfig } from "@/lib/env"
 import { sharedMetadata } from '@/shared/metadata'
+import {getHierarchyUrl} from "@/lib/url-utils"
 interface Region {
   name: string
   districts: District[]
@@ -129,7 +130,7 @@ export default async function HierarchyPage() {
                   <Button asChild size="sm">
                     <Link
                        href={{
-                              pathname: region.name === "Інші"?"/hierarchy/others":`/hierarchy/${encodeURIComponent(region.name)}`,
+                              pathname: region.name === "Інші"?"/hierarchy/others":getHierarchyUrl(region.name),
                             }}
                       className="flex items-center gap-2">
                       <span>{region.name === "Інші" ? "Переглянути парафії" : "Переглянути райони"}</span>

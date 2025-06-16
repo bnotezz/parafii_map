@@ -9,6 +9,7 @@ import { notFound } from "next/navigation"
 import { Metadata } from 'next'
 import { siteConfig } from "@/lib/env"
 import { sharedMetadata } from '@/shared/metadata'
+import { getHierarchyUrl, normalizeForUrl, safeDecodeURIComponent, safeDeNormalizeURIComponent } from "@/lib/url-utils"
 interface Parish {
   id: string
   title: string
@@ -31,9 +32,9 @@ export async function generateMetadata({
 }: { params: { region: string; district: string; hromada: string } }): Promise<Metadata> {
   const { region,district,hromada } = await params
   
-  const regionName = decodeURIComponent(region)
-  const districtName = decodeURIComponent(district)
-  const hromadaName = decodeURIComponent(hromada)
+  const regionName = safeDeNormalizeURIComponent(region)
+  const districtName = safeDeNormalizeURIComponent(district)
+  const hromadaName = safeDeNormalizeURIComponent(hromada)
 
   const title = `Метричні книги - ${hromadaName}, ${districtName}, ${regionName}`
   const description = `Перегляд метричних книг громади ${hromadaName} району ${districtName} регіону ${regionName} з архіву ДАРО`
@@ -45,7 +46,7 @@ export async function generateMetadata({
           ...sharedMetadata.openGraph,
           title:title,
           description:description,
-          url: `${siteConfig.url}/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}/${encodeURIComponent(hromadaName)}`,
+          url: `${siteConfig.url}${getHierarchyUrl(regionName,districtName,hromadaName)}`,
         },
         twitter: {
           ...sharedMetadata.twitter,
@@ -67,9 +68,9 @@ export async function generateStaticParams(): Promise<PageParams[]> {
         region.districts?.forEach((district: any) => {
           district.hromadas?.forEach((hromada: any) => {
             params.push({
-              region: encodeURIComponent(region.name),
-              district: encodeURIComponent(district.name),
-              hromada: encodeURIComponent(hromada.name),
+              region: normalizeForUrl(region.name),
+              district: normalizeForUrl(district.name),
+              hromada: normalizeForUrl(hromada.name),
             })
           })
         })
@@ -93,32 +94,35 @@ export default async function HromadaPage({
 
     const { region,district,hromada } = await params
   
-    const decodedRegionName = decodeURIComponent(region)
-    const decodedDistrictName = decodeURIComponent(district)
-    const decodedHromadaName = decodeURIComponent(hromada)
+    const decodedRegionName = safeDecodeURIComponent(region)
+    const decodedDistrictName = safeDecodeURIComponent(district)
+    const decodedHromadaName = safeDecodeURIComponent(hromada)
 
     // Знаходимо область
-    const regionItem = data.find((r: any) => r.name === decodedRegionName)
+    const regionItem = data.find((r: any) => normalizeForUrl(r.name) === normalizeForUrl(decodedRegionName))
 
     if (!regionItem) {
+      console.error("Region not found:", decodedRegionName)
       return notFound()
     }
 
     const regionName = regionItem.name
 
     // Знаходимо район
-    const districtItem = regionItem.districts?.find((d: any) => d.name === decodedDistrictName)
+    const districtItem = regionItem.districts?.find((d: any) => normalizeForUrl(d.name) === normalizeForUrl(decodedDistrictName))
 
     if (!districtItem) {
+      console.error("District not found:", decodedDistrictName)
       return notFound()
     }
 
     const districtName = districtItem.name
 
     // Знаходимо громаду
-    const hromadaItem = districtItem.hromadas?.find((h: any) => h.name === decodedHromadaName)
+    const hromadaItem = districtItem.hromadas?.find((h: any) => normalizeForUrl(h.name) === normalizeForUrl(decodedHromadaName))
 
     if (!hromadaItem) {
+      console.error("Hromada not found:", decodedHromadaName)
       return notFound()
     }
 
@@ -152,11 +156,11 @@ export default async function HromadaPage({
     const breadcrumbItems = [
       {
         label: regionName,
-        href: `/hierarchy/${encodeURIComponent(regionName)}`,
+        href: getHierarchyUrl(regionName),
       },
       {
         label: districtName,
-        href: `/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}`,
+        href: getHierarchyUrl(regionName,districtName),
       },
       { label: hromadaName },
     ]
@@ -175,7 +179,7 @@ export default async function HromadaPage({
 
           <div className="max-w-5xl mx-auto space-y-6">
             <Button asChild variant="outline" className="mb-6">
-              <Link href={`/hierarchy/${encodeURIComponent(regionName)}/${encodeURIComponent(districtName)}`} className="flex items-center gap-2">
+              <Link href={getHierarchyUrl(regionName,districtName)} className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Повернутися до громад
               </Link>
