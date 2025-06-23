@@ -128,7 +128,7 @@ async function getParishData(parishId: String): Promise<Parish | null> {
                   parish.region_name = region.name
                   parish.modern_settlement_name = [region.name, district.name, hromada.name, settlement.name]
                     .filter(Boolean)
-                    .join(" ")
+                    .join(", ")
 
                   break outer
                 }

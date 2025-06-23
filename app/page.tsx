@@ -11,8 +11,10 @@ export const revalidate = false
 export function generateMetadata(): Metadata{
   return {
     verification: {
-      google: "google-site-verification-code", // Replace with actual verification code
-      microsoft: "microsoft-site-verification-code", // Replace with actual verification code
+      google: "nMBwT6ko1JZKKKwSmhRhiVVzMzXjgtnLhPAq9rL_xq8",
+      other: {
+        "msvalidate.01": 'EB35443237760ADFC57F7289BBD70E79',
+      },
     },
   }
 }
