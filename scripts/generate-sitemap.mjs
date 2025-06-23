@@ -32,7 +32,6 @@ async function generateSitemap() {
   // Start XML content
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Static pages -->
   <url>
     <loc>${baseUrl}/</loc>
     <lastmod>${today}</lastmod>
