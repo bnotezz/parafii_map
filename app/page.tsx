@@ -118,6 +118,10 @@ export default async function HomePage() {
                     <span className="text-white/80">Метричних книг:</span>
                     <span className="font-bold">{statistics.books}</span>
                   </div>
+                   <div className="flex justify-between">
+                    <span className="text-white/80">Роки:</span>
+                    <span className="font-bold">{statistics.years}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>

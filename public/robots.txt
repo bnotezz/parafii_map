@@ -1,15 +1,9 @@
 # Allow all crawlers except specific paths
 User-agent: *
+Allow: /
 Disallow: /search/
 Disallow: /api/
 Disallow: /admin/
 
-# Specifically block Yandex
-User-agent: Yandex
-User-agent: YandexBot
-User-agent: YandexImages
-User-agent: YandexMobileBot
-Disallow: /
-
 # Sitemap location
-Sitemap: ${baseUrl}/sitemap.xml
+Sitemap: https://daro-metric-map.pages.dev/sitemap.xml
