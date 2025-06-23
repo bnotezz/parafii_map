@@ -9,9 +9,9 @@ import { toSlug as slugify } from '../lib/slug.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Function to get today's date in YYYY-MM-DD format
+// Function to get today's date in sitemap format (ISO 8601)
 function getTodayDate() {
-  return new Date().toISOString().split("T")[0];
+  return new Date().toISOString();
 }
 
 // Function to generate sitemap XML content
