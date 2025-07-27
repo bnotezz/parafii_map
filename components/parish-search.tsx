@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Search, Loader2 } from "lucide-react"
 import { ParishCard } from "@/components/parish-card"
 import { useDebounce } from "@/hooks/use-debounce"
 import { enhancedSearch } from "@/lib/search-utils"
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 interface Parish {
   id: string
@@ -60,7 +61,14 @@ function flattenPerishesData(data: any[]): Parish[] {
 
 
 export default function SearchComponent() {
-     const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  
+  // Get initial search term from URL
+  const initialSearchTerm = searchParams.get('q') || ''
+  
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm)
   const [parishes, setParishes] = useState<Parish[]>([])
   const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
@@ -129,6 +137,30 @@ export default function SearchComponent() {
       region_name: result.parish.region,
     }))
   }, [searchResults])
+
+  // Update URL when search term changes
+  const updateURL = useCallback((query: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    
+    if (query.trim()) {
+      params.set('q', query.trim())
+    } else {
+      params.delete('q')
+    }
+    
+    const newUrl = `${pathname}?${params.toString()}`
+    router.replace(newUrl, { scroll: false })
+  }, [pathname, router, searchParams])
+
+  // Update URL when debounced search term changes
+  useEffect(() => {
+    updateURL(debouncedSearchTerm)
+  }, [debouncedSearchTerm, updateURL])
+
+  // Handle search input change
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+  }
 
   if (loading) {
     return (
