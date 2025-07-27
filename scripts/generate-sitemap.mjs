@@ -33,7 +33,7 @@ async function generateSitemap() {
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>${baseUrl}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
@@ -120,10 +120,17 @@ async function generateSitemap() {
 async function writeSitemap() {
   try {
     const sitemap = await generateSitemap();
+
     const filePath = path.join(process.cwd(), "public", "sitemap.xml");
 
     fs.writeFileSync(filePath, sitemap);
     console.log(`Sitemap generated at ${filePath}`);
+    // Save urls to text file
+    // Extract urls from the sitemap
+    const urls = sitemap.match(/<loc>(.*?)<\/loc>/g).map((url) => url.replace(/<\/?loc>/g, '').trim());
+    const urlsFilePath = path.join(process.cwd(), "public", "sitemap.txt");
+    fs.writeFileSync(urlsFilePath, urls.join('\n'));
+
     return true;
   } catch (error) {
     console.error("Error generating sitemap:", error);
