@@ -27,6 +27,44 @@ def main():
     
     print(f"Parsed {len(parsed_settlements)} settlements saved to {settlements_file}")
 
+ADMINISTRATIVE_UNITS ={
+    "воєв.": "voivodeship",
+    "воєводство": "voivodeship",
+    "губернія": "governorate",
+    "губ.": "governorate",
+    "повіт": "poviat",
+    "пов": "poviat",
+    "пов.": "poviat",
+    "вол": "volost",
+    "волость": "volost",
+    "волості": "volost",
+    "вол.": "volost",
+    "гміна": "gmina",
+    "гм.": "gmina",
+    "гм": "gmina",
+    "р-н": "rayon",
+    "рн.": "rayon",
+    "район": "rayon",
+    "обл.": "oblast",
+    "область": "oblast"
+}
+def parse_administrative_units(text):
+    pat = re.compile(r'(?P<name>[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*(?:\s+[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*)*)\s+(?P<type>воєв(?:\.|одство)?|губ(?:\.|ернія)?|пов(?:\.|іт)?|вол(?:\.|ость|ості)?|гміна|р-н|рн\.?|гм\.?|район|обл\.|область)(?=,|$)')
+
+    pairs = [(m.group('name'), m.group('type')) for m in pat.finditer(text)]
+    if not pairs:
+        print(f"No administrative units found in: {text}")
+        return {}
+    result = {}
+    for name, type_ in pairs:
+        type_ = type_.strip().lower()
+        if type_ in ADMINISTRATIVE_UNITS:
+            result[ADMINISTRATIVE_UNITS[type_]] = name.strip()
+        else:
+            print(f"Unknown administrative unit type: {type_}")
+
+    return result
+
 
 def parse_location(text):
     country_pattern = r"\s*Республіка (?P<country>\S+?)\s*,"
@@ -88,8 +126,13 @@ def parse_settlement(line):
 
         settlement = {
             "name": settlement_name,
-            "historic_district": match.group("historic_district").strip()
+            "title": line.strip()
         }
+        historic_district_label = match.group("historic_district").strip()
+        if(historic_district_label):
+            settlement["historic_district"] = parse_administrative_units(historic_district_label)
+            settlement["historic_district"]["title"] = historic_district_label
+
         if(merged):
             settlement["merged"] = merged
         if(removed):

@@ -42,19 +42,19 @@ def match_entry(catalog_entry, locations):
     if len(candidates) > 1 and povit:
         candidates = [
             loc for loc in candidates
-            if povit.lower() in loc.get('historic_district', '').lower()
+            if povit.lower() in loc.get('historic_district', '').get('title', '').lower()
         ]
     # 3) якщо ще більше одного — historic_district ⊇ volost
     if len(candidates) > 1 and volost:
         def has_volost(loc):
-            hd = loc.get('historic_district', '').lower()
+            hd = loc.get('historic_district', '').get('title', '').lower()
             return (volost.lower() in hd) 
         candidates = [loc for loc in candidates if has_volost(loc)]
     # 4) якщо більше одного — фільтруємо historic_district ⊇ territory
     if len(candidates) > 1:
         candidates = [
             loc for loc in candidates
-            if territory.lower() in loc.get('historic_district', '').lower()
+            if territory.lower() in loc.get('historic_district', '').get('title', '').lower()
         ]
 
     if not candidates:
@@ -128,7 +128,7 @@ def build_parafii_locations(catalog_path, locations_path, output_path):
             'location': coords,
             'old_district': loc.get('old_district', {}),
             'new_district': loc.get('new_district', {}),
-            'historic_district': loc.get('historic_district', ''),
+            'historic_district': loc.get('historic_district', {}),
         }
 
         parafii.append(info)
