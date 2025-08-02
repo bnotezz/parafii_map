@@ -17,9 +17,14 @@ def main():
     # Parse all paragraphs
     parsed_settlements = []
     for para in doc.paragraphs:
-        parsed = parse_settlement(para.text)
+        if(not para.text.strip()):
+            continue
+        parsed = parse_settlement(para.text.strip())
         if parsed:
             parsed_settlements.append(parsed)
+        else:
+            #print(f"Failed to parse settlement from line: {para.text}")
+            continue
 
     # Save to JSON file
     with open(settlements_file, "w", encoding="utf-8") as json_file:
@@ -32,9 +37,9 @@ ADMINISTRATIVE_UNITS ={
     "воєводство": "voivodeship",
     "губернія": "governorate",
     "губ.": "governorate",
-    "повіт": "poviat",
-    "пов": "poviat",
-    "пов.": "poviat",
+    "повіт": "povit",
+    "пов": "povit",
+    "пов.": "povit",
     "вол": "volost",
     "волость": "volost",
     "волості": "volost",
@@ -49,7 +54,7 @@ ADMINISTRATIVE_UNITS ={
     "область": "oblast"
 }
 def parse_administrative_units(text):
-    pat = re.compile(r'(?P<name>[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*(?:\s+[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*)*)\s+(?P<type>воєв(?:\.|одство)?|губ(?:\.|ернія)?|пов(?:\.|іт)?|вол(?:\.|ость|ості)?|гміна|р-н|рн\.?|гм\.?|район|обл\.|область)(?=,|$)')
+    pat = re.compile(r'(?P<name>[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*(?:\s+[А-ЯІЇЄҐ][А-Яа-яІіЇїЄєҐґʼ’\-]*)*)\s+(?P<type>воєв(?:\.|одство)?|губ(?:\.|ернія)?|пов(?:\.|іт)?|вол(?:\.|ость|ості)?|гміна|р-н|рн\.?|гм\.?|район|обл\.|область)(?=,|\s+|$)')
 
     pairs = [(m.group('name'), m.group('type')) for m in pat.finditer(text)]
     if not pairs:
@@ -94,6 +99,8 @@ def parse_location(text):
 
 # Function to parse each line
 def parse_settlement(line):
+    if not line.strip() or len(line) < 5:
+        return None
     pattern = r"^(?P<settlement_name>[^,]+),\s*(?P<historic_district>.+?)(?:\s*\((?P<old_district>.+?)\))?\s+(?P<pages>[\d,\s]+)$"
     match = re.match(pattern, line.strip())
     if match:

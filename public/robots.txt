@@ -8,3 +8,4 @@ Disallow: /admin/
 # Sitemap location
 Sitemap: https://daro-metric-map.pages.dev/sitemap.xml
 Sitemap: https://daro-metric-map.pages.dev/sitemap.txt
+Sitemap: https://daro-metric-map.pages.dev/sitemap01.txt

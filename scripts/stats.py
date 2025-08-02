@@ -44,7 +44,50 @@ def geojson_stats(logger):
         json.dump(duplicates, f, ensure_ascii=False, indent=2)
     logger.info(f"Wrote {len(duplicates)} records to {output_path}")
 
-def settlemnts_stats(logger):
+def geobooks_stats(logger):
+    settlements_path = "data/parsed_settlements.json"
+    with open(settlements_path, 'r', encoding='utf-8') as f:
+        settlements = json.load(f)
+
+    without_old_district = set()
+    povit_gmina_combinations = set()
+    povit_volost_combinations = set()
+    other_combinations = set()
+    for settlement in settlements:
+        old_district = settlement.get("old_district")
+        if not old_district:
+            without_old_district.add(settlement.get("title", 'Unknown'))
+        historic_district = settlement.get("historic_district", {})
+        povit = historic_district.get("povit")
+        volost = historic_district.get("volost")
+        gmina = historic_district.get("gmina")
+
+        if povit and (gmina or historic_district.get("voivodeship")):
+            povit_gmina_combinations.add(f"{povit} - {gmina or ''}")
+        if povit and (volost or historic_district.get("voivodeship")):
+            povit_volost_combinations.add(f"{povit} - {volost or ''}")
+        else:
+            other_combinations.add(historic_district.get("title", 'Unknown'))
+
+
+    logger.info(f"Number of unique povit-gmina combinations: {len(povit_gmina_combinations)}")
+    logger.info("Unique povit-gmina combinations:")
+    for combination in sorted(povit_gmina_combinations):
+        logger.info(combination)
+
+    logger.info(f"Number of unique povit-volost combinations: {len(povit_volost_combinations)}")
+    logger.info("Unique povit-volost combinations:")
+    for combination in sorted(povit_volost_combinations):
+        logger.info(combination)
+    logger.info(f"Number of other combinations: {len(other_combinations)}")
+    logger.info("Other combinations:")
+    for combination in sorted(other_combinations):
+        logger.info(combination)
+
+    logger.info(f"Number of settlements without old_district: {len(without_old_district)}")
+    
+
+def settlements_stats(logger):
     settlements_path = "data/settlements_locations.json"
     with open(settlements_path, 'r', encoding='utf-8') as f:
         settlements = json.load(f)
@@ -113,14 +156,17 @@ def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    logger.info("Starting settlements statistics...")
-    settlemnts_stats(logger)
+    # logger.info("Starting settlements statistics...")
+    # settlements_stats(logger)
 
-    logger.info("Starting catalog statistics...")
-    catalog_stats(logger)
+    # logger.info("Starting catalog statistics...")
+    # catalog_stats(logger)
 
-    logger.info("Starting geojson statistics...")
-    geojson_stats(logger)
+    # logger.info("Starting geojson statistics...")
+    # geojson_stats(logger)
+
+    logger.info("Starting geobooks statistics...")
+    geobooks_stats(logger)
 
 if __name__ == "__main__":
     main()
