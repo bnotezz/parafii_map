@@ -35,6 +35,10 @@ interface Parish {
   district_name?: string
   region_name?: string
   modern_settlement_name?: string
+  romanCatholicData?: {
+    query?: string
+    geneteka?: string
+  }
   books?: {
     births: BookRecord[]
     marriages: BookRecord[]
@@ -136,6 +140,22 @@ async function getParishData(parishId: String): Promise<Parish | null> {
             }
           }
         }
+      }
+    }
+
+    // Завантажити католицькі дані, якщо парафія католицька
+    if (parish.religion === "roman_catholic") {
+      try {
+        const romanCatholicData = await import("@/data/roman_catholic_parafii.json").then((module) => module.default)
+        const romanCatholicParish = romanCatholicData.find((p: any) => String(p.id) === String(parish.id))
+        if (romanCatholicParish) {
+          parish.romanCatholicData = {
+            query: romanCatholicParish.query,
+            geneteka: romanCatholicParish.geneteka,
+          }
+        }
+      } catch (error) {
+        console.error("Error loading Roman Catholic parish data:", error)
       }
     }
 
@@ -455,7 +475,13 @@ export default async function ParishPage({ params }: { params: { id: string } })
             )}
 
             {/* External Resources */}
-            <AdditionalResources searchTerm={parish.church_settlement} showArchiveInfo={true} />
+            <AdditionalResources 
+              searchTerm={parish.church_settlement} 
+              showArchiveInfo={true}
+              religion={parish.religion}
+              parishId={parish.id}
+              romanCatholicData={parish.romanCatholicData}
+            />
           </div>
         </div>
       </div>

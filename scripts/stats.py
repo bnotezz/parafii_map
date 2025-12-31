@@ -1,6 +1,7 @@
 import re
 import json
 import logging
+import csv
 
 def geojson_stats(logger):  
     geojson_path = "data/parafii.geojson"
@@ -43,6 +44,41 @@ def geojson_stats(logger):
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(duplicates, f, ensure_ascii=False, indent=2)
     logger.info(f"Wrote {len(duplicates)} records to {output_path}")
+
+def parafii_settlements_stats(logger):
+    parafii_path = "data/parafii_locations.json"
+    with open(parafii_path, 'r', encoding='utf-8') as f:
+        parafii_data = json.load(f)
+
+    locations_mapping_path='data/locations_mapping.csv'
+    with open(locations_mapping_path, 'r', encoding='utf-8') as f:
+        locations_mapping = {row['id']: row for row in csv.DictReader(f)}
+    
+
+
+    settlements = {}
+    for parafia in parafii_data:
+        if locations_mapping.get(parafia.get('id')):
+            continue
+
+        new_district = parafia.get("new_district")
+        if not new_district:
+            logger.warning(f"Parafia without new_district: {parafia.get('title', 'Unknown')}")
+            continue
+
+        if not parafia.get("religion","") != "orthodox":
+            continue
+
+        katotth = new_district.get("katotth")
+        if katotth:
+            settlement = settlements.get(katotth, {"parafii": [], "new_district": new_district,"old_district": parafia.get("old_district")})
+            settlement["parafii"].append({"title": parafia.get("title", "Unknown"), "id": parafia.get("id", "Unknown")})
+
+            settlements[katotth] = settlement
+
+    logger.info(f"Number of settlements with exactly one parafia: {len(settlements)}")
+    for settlement_info in settlements.values():
+        logger.info(f"Settlement: {settlement_info['new_district'].get('name', 'Unknown')}, Parafia: {settlement_info['parafii'][0]}")
 
 def geobooks_stats(logger):
     settlements_path = "data/parsed_settlements.json"
@@ -156,6 +192,7 @@ def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
+    parafii_settlements_stats(logger)
     # logger.info("Starting settlements statistics...")
     # settlements_stats(logger)
 
@@ -165,8 +202,9 @@ def main():
     # logger.info("Starting geojson statistics...")
     # geojson_stats(logger)
 
-    logger.info("Starting geobooks statistics...")
-    geobooks_stats(logger)
+   # logger.info("Starting geobooks statistics...")
+   # geobooks_stats(logger)
+    parafii_settlements_stats(logger)
 
 if __name__ == "__main__":
     main()
