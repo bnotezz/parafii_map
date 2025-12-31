@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "prebuild": ".venv/bin/python scripts/export_parafii_to_tree_view.py && .venv/bin/python scripts/export_parafii_to_geojson.py && node scripts/copy-data.mjs && node scripts/generate-sitemap.mjs",
+    "prebuild": "python3 scripts/export_parafii_to_tree_view.py && python3 scripts/export_parafii_to_geojson.py && node scripts/copy-data.mjs && node scripts/generate-sitemap.mjs",
     "build": "next build",
     "preexport": "node scripts/copy-data.mjs",
     "start": "serve out",
