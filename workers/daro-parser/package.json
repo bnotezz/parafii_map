@@ -1,11 +1,16 @@
 {
     "name": "daro-parser-worker",
     "version": "1.0.0",
+    "type": "module",
     "scripts": {
-      "deploy": "wrangler publish --env production"
+        "deploy": "wrangler publish --env production",
+        "test": "node --experimental-vm-modules node_modules/.bin/jest",
+        "test:integration": "SKIP_INTEGRATION=0 node --experimental-vm-modules node_modules/.bin/jest lib.integration.test.js"
     },
     "devDependencies": {
-      "wrangler": "^4.15.2"
+        "jest": "^29.6.2",
+        "jest-environment-jsdom": "^29.6.2",
+        "jest-fetch-mock": "^3.0.3",
+        "wrangler": "^4.15.2"
     }
-  }
-  
+}

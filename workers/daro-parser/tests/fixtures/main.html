@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<head>
+    <title>Державний архів Рівненської області</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <base href="/">
+
+    <!--./media/css/style.css the path not working, need to change the file name after each upload. -->
+<!--     <link rel="stylesheet" href="./media/css/style.css">-->
+    <link rel="stylesheet" href="./media/css-newww/style.css">
+    <!-- <link rel="stylesheet" href="https://unpkg.com/swiper/css/swiper.min.css">-->
+    <link rel="stylesheet" href="./media/cdn/swiper-bundle.min.css">
+
+    <!-- Code snippet to speed up Google Fonts rendering: googlefonts.3perf.com -->
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Forum|Roboto:400,700&display=swap" as="fetch" crossorigin="anonymous">
+    <link rel="stylesheet" href="./media/cdn/datepicker.min.css">
+    <script type="text/javascript">
+        !function(e,n,t){"use strict";var o="https://fonts.googleapis.com/css?family=Forum|Roboto:400,700&display=swap",r="__3perf_googleFonts_97d88";function c(e){(n.head||n.body).appendChild(e)}function a(){var e=n.createElement("link");e.href=o,e.rel="stylesheet",c(e)}function f(e){if(!n.getElementById(r)){var t=n.createElement("style");t.id=r,c(t)}n.getElementById(r).innerHTML=e}e.FontFace&&e.FontFace.prototype.hasOwnProperty("display")?(t[r]&&f(t[r]),fetch(o).then(function(e){return e.text()}).then(function(e){return e.replace(/@font-face {/g,"@font-face{font-display:swap;")}).then(function(e){return t[r]=e}).then(f).catch(a)):a()}(window,document,localStorage);
+    </script>
+    <link rel="icon" href="./media/images/header/favicon.png" type="image/x-icon">
+    <!-- End of code snippet for Google Fonts -->
+<!--    <script src="https://unpkg.com/swiper/js/swiper.min.js"></script>-->
+    <script src="./media/cdn/swiper-bundle.min.js"></script>
+    <script src="./media/cdn/jquery-3.7.0.min.js"></script>
+    <script src="./media/cdn/jquery.inputmask.bundle.js"></script>
+
+    <script src="./media/js-compiled/script.js"></script>
+    <script src="./media/cdn/datepicker.min.js"></script>
+
+    <!--PRINT-->
+    <link rel="stylesheet" href="./media/cdn/print.min.css">
+    <script src="./media/cdn/print.min.js"></script>
+
+    <link rel="stylesheet" href="./media/cdn/jquery.fancybox.min.css">
+    <script src="./media/cdn/jquery.fancybox.min.js"></script>
+
+    <!-- bvi -->
+    <link rel="stylesheet" href="media/bvi/bvi/bvi.min.css" type="text/css">
+    <link rel="stylesheet" href="media/bvi/bvi/all.min.css" type="text/css">
+
+</head>
+<body>
+<div class="main-wrapper">
+    <div class="header-wrapper-bg">
+    <header class="header-wrapper">
+        <div class="header-top">
+            <div class="header-top-wrapepr">
+                <div class="nav-wrapper header-left-side">
+                    <div class="nav-toggle-wrapper">
+                        <button class="toggle-menu">
+                            <div class="menu-line">
+                                <span class="line-toggle"></span>
+                                <span class="line-toggle"></span>
+                            </div>
+                            <div class="menu-title-wrapper">
+                                <p class="menu-title">menu</p>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="nav-search-wrapper">
+                        <button class="search-toggle">
+                            <img src="/media/images/header/search.png" alt="search">
+                        </button>
+
+                    </div>
+
+
+
+                </div>
+                <a class="logo-link" href="/">
+                    <div class="logo-wrapper">
+                        <div class="logo-left-side">
+                            <img class="trident-image" src="/media/images/header/urk_gerb.png" alt="urk gerb">
+                        </div>
+                        <div class="header-title-wrapper">
+                            <div class="header-top-title">
+                                <p class="header-top-title-text">Державний архів Рівненської області</p>
+                            </div>
+                            <div class="header-bottom-title">
+                                <p class="header-bottom-title-text">State Archives of Rivne region</p>
+                            </div>
+                        </div>
+                        <div class="logo-right-side">
+                            <img class="gerb-image" src="/media/images/header/gerb_rivne.png" alt="gerb rivne">
+                        </div>
+                    </div>
+                </a>
+                <div class="header-right-side">
+                    <div class="header-contacts">
+                        <div class="contacts-marker">
+                            <img src="/media/images/header/map-icon.png" alt="map marker">
+                        </div>
+                        <div class="contacts-title">
+                            <p class="header-contacts-title">Контакти</p>
+                        </div>
+
+                    </div>
+                    <div class="header-fb-eye">
+                        <div class="header-fb">
+                            <a href="https://www.facebook.com/ArhivRivne">
+                                <img src="/media/images/header/fb.png" alt="facebook">
+                            </a>
+                        </div>
+                        <div class="header-eye">
+                            <a class="bvi-open" href="#">
+                                <img src="/media/images/header/eye-icon.png" alt="eye">
+                            </a>
+                        </div>
+
+                    </div>
+<!--                    <div class="weather-wrapper">-->
+<!--                        <link type="text/css" rel="stylesheet" href="https://www.meteoprog.ua/css/winformer.min.css">-->
+<!--                        <div class="meteoprog-informer" style="width: 106px"-->
+<!--                            data-params='{"id": "5db84ab4984852fd408b88b9", "city_ids": "2763", "domain": "https://www.meteoprog.ua/ua/", "lang": "ua"}'>-->
+<!--                            <a title="Погода в місті Рівне" target="_blank"-->
+<!--                                href="https://www.meteoprog.ua/ua/weather/Rivne">-->
+<!--                                <img style="margin: 0 auto; display: block"-->
+<!--                                    src="https://www.meteoprog.ua/images/preloader.gif" alt="Loading...">-->
+<!--                            </a>-->
+<!--                            <a target="_blank" class="constructor__met2wlink"-->
+<!--                                href="https://www.meteoprog.ua/ua/review/Rivne/">Погода на 2 тижні</a>-->
+<!--                            <a class="constructor__metlink" target="_blank" href="https://www.meteoprog.ua/ua/"> <img-->
+<!--                                    style="display: block; margin: 0 auto;" alt="Meteoprog"-->
+<!--                                    src="https://www.meteoprog.ua/images/meteoprog-inf.png"> </a> </div>-->
+<!--                        <script type="text/javascript" src="https://www.meteoprog.ua/js/winformer.min.js"></script>-->
+<!--                    </div>-->
+                </div>
+            </div>
+
+            <div class="hiden-show-logo">
+                <div class="hiden-title-wrapper">
+                    <div class="header-top-title">
+                        <p class="header-top-title-text">Державний архів Рівненської області</p>
+                    </div>
+                    <div class="header-bottom-title">
+                        <p class="header-bottom-title-text">State Archives of Rivne region</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="menu-wrapper header-bottom">
+            <div class="dropdown-menu-wrapper">
+                <ul class='dropdown-menu parent-menu'><li class='dropdown'><a class='nav-link' href=/ aria-expanded='false'> Головна </a><li class='dropdown'><a class='nav-link' href=novyny aria-expanded='false'> Новини </a><li class='dropdown'><a class='nav-link' href=# aria-expanded='false'> E-архів </a><a class='nav-caret' role='button' aria-haspopup='true' aria-expanded='false'></a><ul class='sub-menu'><li><a href=family-search>Family Search</a><li><a href=ocifrovani-sprav>Справи</a><li><a href=/ocifrovani-opisi/Дорадянський%20період>Описи</a></ul></li><li class='dropdown'><a class='nav-link' href=pro-arhiv aria-expanded='false'> Про архів </a><a class='nav-caret' role='button' aria-haspopup='true' aria-expanded='false'></a><ul class='sub-menu'><li><a href=istoriya>Історія</a><li><a href=struktura>Структура</a></ul></li><li class='dropdown'><a class='nav-link' href=fondy-arhivy aria-expanded='false'> Фонди архіву </a><a class='nav-caret' role='button' aria-haspopup='true' aria-expanded='false'></a><ul class='sub-menu'><li><a href=biblioteka>Бібліотека</a><li><a href=fondy-online>Документальні виставки online</a></ul></li><li class='dropdown'><a class='nav-link' href=hromadyanam aria-expanded='false'> Громадянам </a><li class='dropdown'><a class='nav-link' href=kontakty aria-expanded='false'> Контакти </a></ul>            </div>
+        </div>
+
+    </header>
+    <div class="search-wrapper">
+        <div class="search-container">
+            <button class="close-search">
+                <img src="/media/images/header/close.png" alt="close">
+            </button>
+            <div class="search-block">
+                <form id="formSearch" class="search-form" action="/" method="get">
+                    <input id="searchButton" class="header-search" type="search" name="q" placeholder="Пошук..." pattern=".*\S+.*" required="'required'">
+                    <button type="submit" form="formSearch">
+                        <img class="search-icon" src="/media/images/header/search-icon.png" alt="search">
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <div class="menu-fullscreen-wrapepr">
+        <div class="menu-fullscreen-container">
+            <div class="header-menu">
+                <ul class='big-parent-menu'><li class='child-sub-menu'><a class='nav-link' href=/ aria-expanded='false'> Головна </a><li class='child-sub-menu'><a class='nav-link' href=novyny aria-expanded='false'> Новини </a><li class='child-sub-menu'><a class='nav-link' href=istoriya aria-expanded='false'> Історія </a><li class='child-sub-menu'><a class='nav-link' href=fondy-arhivy aria-expanded='false'> Фонди архіву </a><li class='child-sub-menu'><a class='nav-link' href=arhivni-ustanovi-oblasti aria-expanded='false'> Архівні установи області </a><li class='child-sub-menu'><a class='nav-link' href=hromadyanam aria-expanded='false'> Громадянам </a><li class='child-sub-menu'><a class='nav-link' href=kontakty aria-expanded='false'> Контакти </a></ul>            </div>
+            <div class="big-menu-wrapper">
+                <div class="big-menu-item">
+                    <ul class="parent-big-sub-menu">
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="#"> Про архів </a>
+                            <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="istoriya">Історія</a></li>
+                                <li><a class="nav-link" href="struktura">Структура</a></li>
+<!--                                <li><a class="nav-link" href="robota-arhivy">Робота архіву</a></li>-->
+                            </ul>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="informyemo-hromadskist"> Інформуємо громадськість </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                             <a class="nav-link" href="arhivni-ustanovi-oblasti"> Архівні установи області </a>
+<!--                            <a class="nav-link" href="arhivni-viddili-rayonnih-derzhavnih-administraciy">Архівні відділи районних держвних адміністрацій</a>-->
+                            <!-- <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="arhivni-viddili-rayonnih-derzhavnih-administraciy">Архівні відділи районних держвних адміністрацій</a></li>
+                                <li><a class="nav-link" href="trudovi-arhivi-v-rayonah-ta-mistah-oblasti">Трудові архіви в районах та містах області</a></li>
+                                <li><a class="nav-link" href="miski-arhivy">Архівні відділи міських рад</a></li>
+                            </ul> -->
+                        </li>
+<!--                        <li class="parent-sub-menu">-->
+<!--                            <a class="nav-link" href="arhivni-ustanovi-oblasti">Трудові архіви в районах та містах області</a>-->
+<!--                        </li>-->
+<!--                        <li class="parent-sub-menu">-->
+<!--                            <a class="nav-link" href="miski-arhivy">Архівні відділи міських рад</a>-->
+<!--                        </li>-->
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="doradchi-organy">Дорадчі органи</a>
+                            <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="rishennya-kolehii">Колегія - Рішення колегії</a></li>
+                                <li><a class="nav-link" href="epk">ЕПК</a></li>
+                                <li><a class="nav-link" href="nmr">НМР</a></li>
+<!--                                <li><a class="nav-link" href="gromadska-rada">Громадська рада</a></li>-->
+                            </ul>
+                        </li>
+                        <!-- <li class="parent-sub-menu">
+                            <a class="nav-link" href="arhivy-rajoniv"> Архівні відділи районних державних адміністрацій</a>
+                        </li> -->
+                        <!-- <li class="parent-sub-menu">
+                            <a class="nav-link" href="trydovi-arhivy"> Трудові архіви в районах </a>
+                        </li> -->
+                        <!-- <li class="parent-sub-menu">
+                            <a class="nav-link" href="miski-arhivy"> Архівні відділи міських рад </a>
+                        </li> -->
+                    </ul>
+                </div>
+                <div class="big-menu-item">
+                    <ul class="parent-big-sub-menu">
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="zvernennya-hromadyan"> Звернення громадян </a>
+                            <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="socialno-pravovi-zapyty">Соціально-правові запити</a></li>
+                                <li><a class="nav-link" href="tematychni-zapyty">Тематичні запити</a></li>
+                                <li><a class="nav-link" href="henealohichni-zapyty">Генеалогічні запити</a></li>
+                                <li><a class="nav-link" href="perelik-cin">Перелік цін</a></li>
+                                <li><a class="nav-link" href="znahodzhennya-dokymentiv">Відомості про місце знаходження документів</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="normatyvna-baza"> Нормативна база </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="halyzevi-prohramy"> Галузеві програми </a>
+                        </li>
+<!--                        <li class="parent-sub-menu">-->
+<!--                            <a class="nav-link" href="derzhavni-posluhy"> Державні послуги </a>-->
+<!--                        </li>-->
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="rozsekrechennya-dokumentiv"> Розсекречення документів </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="arhivy-y-zmi"> Архіви у ЗМІ </a>
+                            <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="arhivy-na-tv">Архіви на радіо та телебаченні</a></li>
+                                <li><a class="nav-link" href="pyblikacii-v-presi">Публікації в пресі</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="big-menu-item">
+                    <ul class="parent-big-sub-menu">
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="fondy-online">Виставки On-line</a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="arhivi-represivnih-organiv-komunistichnogo-totalitarnogo-rez">Архіви репресивних органів комуністичного тоталітарного режиму 1917-1991 років</a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="dovidkovyj-aparat"> Довідковий апарат </a>
+                            <ul class="big-sub-menu">
+                                <li><a class="nav-link" href="fondy-arhivy">Фонди архіву </a></li>
+                                <a class="nav-link" href="#"> Е-архів </a>
+                                <ul class="big-sub-menu">
+                                    <li><a class="nav-link" href="/family-search">Family Search</a></li>
+                                    <li><a class="nav-link" href="/ocifrovani-opisi/3">Описи</a></li>
+                                    <li><a class="nav-link" href="/ocifrovani-sprav">Справи</a></li>
+                                </ul>
+<!--                                <li class="parent-sub-menu">-->
+<!--                                    <a class="nav-link" href="mizhnarodna-diyalnist"> Міжнародна діяльність </a>-->
+<!--                                </li>-->
+                            </ul>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="mizhnarodna-diyalnist"> Міжнародна діяльність </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="big-menu-item">
+                    <ul class="parent-big-sub-menu">
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="dostup-do-publichnoyi-informaciyi"> Доступ до публічної інформації </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="nashi-vydannya"> Наші видання </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                        <a class="nav-link" href="zapobigannya-proyavam-korupciyi"> Запобігання проявам корупції </a>
+                            <ul class="big-sub-menu">
+                                <li> <a class="nav-link" href="zapobihannya-korypcii">Повідомлення про корупцію</a></li>
+                            </ul>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="spivpracya"> Співпраця </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="vakansiyi"> Вакансії </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="ochyshchennya-vlady"> Очищення влади </a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="vidkriti-dani">Відкриті дані</a>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="korisni-posilannya"> Корисні посилання </a>
+                            <ul class="big-sub-menu">
+<!--                                <li> <a class="nav-link" href="arhivi-zakordonom">Архіви закордоном</a></li>-->
+                                <li> <a class="nav-link" href="arhivi-ukrayini">Архіви України</a></li>
+                            </ul>
+                        </li>
+                        <li class="parent-sub-menu">
+                            <a class="nav-link" href="karta-saity"> Карта сайту </a>
+                        </li>
+<!--                        <li class="parent-sub-menu">-->
+<!--                            <a class="nav-link" href="in-english">In English</a>-->
+<!--                        </li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contacts-modal">
+    <div class="contacts-modal-wrapper">
+        <div class="contacts-modal-container">
+            <div class="contacts-modal-top">
+                <h3 class="contacts-modal-title">Контактна інформація</h3>
+            </div>
+            <div class="contacts-modal-items">
+                <div class="contacts-modal-center">
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Адреса (Корпус №1)</p>
+                        <button id="first-map" class="subdescription">вул. С. Бандери, 26-а, м. Рівне
+                            33014, Україна</button>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Адреса (Корпус №2)</p>
+                        <button id="second-map" class="subdescription">вул. Кавказька, 8, м. Рівне
+                            33014, Україна</button>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Стіл довідок</p>
+                        <p class="subdescription">
+                            (0362) 67-15-12</p>
+                        <p class="subdescription">(0362) 67-15-07</p>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Приймальня</p>
+                        <p class="subdescription">(0362) 67-15-14</p>
+                    </div>
+                </div>
+                <div class="contacts-modal-bottom">
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Прийомні дні</p>
+                        <p class="subdescription">Понеділок</p>
+                        <p class="subdescription">Середа</p>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Години роботи</p>
+                        <p class="subdescription">9:00 — 18:00
+                        </p>
+                        <p class="subdescription">9:00 — 18:00</p>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Обідня перерва</p>
+                        <p class="subdescription">13:00 — 14:00</p>
+                        <p class="subdescription">13:00 — 14:00</p>
+                    </div>
+                    <div class="contacts-modal-item">
+                        <p class="subtitle">Електронна пошта</p>
+                        <p class="subdescription"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4b2a392823223d2e14393d0b2a392823652c243d653e2a">[email&#160;protected]</a></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <button class="close-icon">
+            <img src="/media/images/header/close-button.svg" alt="close">
+        </button>
+
+
+        <div class="maps-wrapper-first">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2531.7928691489665!2d26.257470751687656!3d50.612386283463096!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x472f1345ca090dd7%3A0x3d2616773a023558!2zMjZBLCDRg9C7LiDQodGC0LXQv9Cw0L3QsCDQkdCw0L3QtNC10YDRiywgMjbQkCwg0KDQvtCy0L3Qviwg0KDQvtCy0LXQvdGB0LrQsNGPINC-0LHQu9Cw0YHRgtGMLCAzMzAxNw!5e0!3m2!1sru!2sua!4v1573132467175!5m2!1sru!2sua"
+                width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+            <button class="close-map-icon">
+                <img src="/media/images/header/close-button.svg" alt="close">
+            </button>
+
+        </div>
+
+        <div class="maps-wrapper-second">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2530.975083471703!2d26.249550715737854!3d50.62757967950028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x472f6caad1d76f6b%3A0x5e7c967d02a7e12e!2z0YPQuy4g0JrQsNCy0LrQsNC30YHQutCw0Y8sIDgsINCg0L7QstC90L4sINCg0L7QstC10L3RgdC60LDRjyDQvtCx0LvQsNGB0YLRjCwgMzMwMDA!5e0!3m2!1sru!2sua!4v1573133049515!5m2!1sru!2sua"
+                width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+            <button class="close-map-icon">
+                <img src="/media/images/header/close-button.svg" alt="close">
+            </button>
+        </div>
+    </div>
+</div>
+        <div class="container-wrapper">
+        <div class="decisions-page orders-ministry">
+    <div class="contacts-page-wrapper">
+        <div class="articles-container">
+            <img class="articles-image" src="/media/images/page-headers/11.jpg" alt="articles">
+            <div class="articles-content">
+                <div class="articles-wrapper">
+                    <div class="page_title">
+                        <div class="breadcrumbs">
+                            <ul></ul>
+                        </div>
+                    </div>
+                    <div class="articles-title">
+                        <h1>Справи</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-container content-margin">
+            <div class="decisions-wrapper">
+                <div class="decisions-container">
+                    <div class="page-inner-content decisions-content">
+
+                        <div class="decision-files-wrapper" style="max-width: 100%; min-width: 100%; overflow: auto">
+                                                            <table style="width:100%">
+                                    <tr>
+                                        <th>Номер опису</th>
+                                        <th>Анотація складу документів опису справ</th>
+                                    </tr>
+                                                                            <tr>
+                                            <td> 4</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=6"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 825 од. зб., 1842-1925рр. </a>
+                                            </td>
+                                        </tr>
+                                                                            <tr>
+                                            <td> 2</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=9"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 785 од. зб., 1840-1914рр. </a>
+                                            </td>
+                                        </tr>
+                                                                            <tr>
+                                            <td> 5</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=10"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 28 од. зб., 1873-1925рр.</a>
+                                            </td>
+                                        </tr>
+                                                                            <tr>
+                                            <td> 6</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=11"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 701 од. зб., 1870-1931рр.</a>
+                                            </td>
+                                        </tr>
+                                                                            <tr>
+                                            <td> 15</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=12"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 131 од. зб., 1859-1944рр</a>
+                                            </td>
+                                        </tr>
+                                                                            <tr>
+                                            <td> 16</td>
+                                            <td>
+                                                <a href="ocifrovani-sprav?period=5&&fund=5&&annotation=13"> Книги записів про народження, шлюб, смерть церков та костелів Рівненської області, 277 од. зб., 1882-1947рр</a>
+                                            </td>
+                                        </tr>
+                                                                    </table>
+                                                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    $(function () {
+        var link = $('#navbar a.nav-anchor');
+        // move to section on click
+        link.on('click', function (e) {
+            var target = $($(this).attr('href'));
+            $('html, body').animate({
+                scrollTop: target.offset().top - 10
+            });
+            $(this).addClass('active');
+            e.preventDefault();
+        });
+        $(window).on('scroll', function () {
+            update();
+        });
+
+        // change active nav element
+        function update() {
+            var sTop = $(window).scrollTop();
+            $('.files-category').each(function () {
+                var id = $(this).attr('id');
+                offset = $(this).offset().top - 100;
+                height = $(this).height();
+                if (sTop >= offset && sTop < offset + height) {
+                    link.removeClass('active');
+                    $('#navbar').find('[data-scroll="' + id + '"]').addClass('active');
+                }
+            });
+        }
+
+        update();
+    });
+</script>
+    </div>
+
+    <button id="back-to-top" title="Вверх">
+        <svg width="13" height="19" viewBox="0 0 13 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.5 19L6.5 1M6.5 1L0.999999 4.5M6.5 1L12 4.5" stroke="#242527"/>
+        </svg>
+
+    </button>
+
+    <style>
+    .site-in-beta-container {
+        flex: 0 0 33.3333%;
+    }
+    .sponsor {
+        display: flex;
+        align-items: center;
+        flex: 0 0 33.3333%;
+    }
+    .sponsor__icon {
+        margin-right: 15px;
+    }
+    .sponsor__text {
+        font-family: Roboto,sans-serif;
+        font-weight: 400;
+        font-size: 11px;
+        line-height: 130%;
+        text-indent: 1px;
+        color: #fff;
+    }
+
+    @media screen and (max-width: 992px) {
+        .sponsor {
+            margin-bottom: 20px;
+        }
+        .sponsor__icon {
+            margin-right: 0px;
+            margin-bottom: 15px;
+        }
+    }
+</style>
+<footer>
+    <div class="footer-wrapper">
+        <div class="footer-container">
+            <div class="footer-menu-wrapper">
+                <ul class='big-parent-menu'><li class='child-sub-menu'><a class='nav-link' href=/ aria-expanded='false'> Головна </a><li class='child-sub-menu'><a class='nav-link' href=novyny aria-expanded='false'> Новини </a><li class='child-sub-menu'><a class='nav-link' href=istoriya aria-expanded='false'> Історія </a><li class='child-sub-menu'><a class='nav-link' href=fondy-arhivy aria-expanded='false'> Фонди архіву </a><li class='child-sub-menu'><a class='nav-link' href=arhivni-ustanovi-oblasti aria-expanded='false'> Архівні установи області </a><li class='child-sub-menu'><a class='nav-link' href=hromadyanam aria-expanded='false'> Громадянам </a><li class='child-sub-menu'><a class='nav-link' href=kontakty aria-expanded='false'> Контакти </a></ul>            </div>
+            <div class="footer-big-menu-wrapper">
+                <div class="show-mobile-menu-wrapper">
+                    <button class="show-footer-mobile-menu">Розгорнути повне меню</button>
+                    <img src="/media/images/home-page/Vector.svg" alt="Vector">
+                </div>
+                <div class="big-menu-wrapper">
+                    <div class="big-menu-item">
+                        <ul class="padding-left-0 parent-big-sub-menu">
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="pro-arhiv"> Про архів </a>
+                                <ul class="big-sub-menu">
+                                    <li><a href="istoriya">Історія</a></li>
+                                    <li><a href="struktura">Структура</a></li>
+<!--                                    <li><a href="robota-arhivy">Робота архіву</a></li>-->
+                                </ul>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="informyemo-hromadskist"> Інформуємо громадськість </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                 <a class="nav-link" href="arhivni-ustanovi-oblasti"> Архівні установи області </a>
+<!--                                <a class="nav-link" href="arhivni-viddili-rayonnih-derzhavnih-administraciy">Архівні відділи районних держвних адміністрацій</a>-->
+                                <!-- <ul class="big-sub-menu">
+                                    <li><a class="nav-link" href="arhivni-viddili-rayonnih-derzhavnih-administraciy">Архівні відділи районних держвних адміністрацій</a></li>
+                                    <li><a class="nav-link" href="trudovi-arhivi-v-rayonah-ta-mistah-oblasti">Трудові архіви в районах та містах області</a></li>
+                                    <li><a class="nav-link" href="miski-arhivy">Архівні відділи міських рад</a></li>
+                                </ul> -->
+                            </li>
+<!--                            <li class="parent-sub-menu">-->
+<!--                                <a class="nav-link" href="arhivni-ustanovi-oblasti">Трудові архіви в районах та містах області</a>-->
+<!--                            </li>-->
+<!--                            <li class="parent-sub-menu">-->
+<!--                                <a class="nav-link" href="miski-arhivy">Архівні відділи міських рад</a>-->
+<!--                            </li>-->
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="doradchi-organy">Дорадчі органи</a>
+                                <ul class="big-sub-menu">
+                                    <li><a class="nav-link" href="rishennya-kolehii">Колегія - Рішення колегії</a></li>
+                                    <li><a class="nav-link" href="epk">ЕПК</a></li>
+                                    <li><a class="nav-link" href="nmr">НМР</a></li>
+<!--                                    <li><a class="nav-link" href="gromadska-rada">Громадська рада</a></li>-->
+                                </ul>
+                            </li>
+                            <!-- <li class="parent-sub-menu">
+                                <a class="nav-link" href="arhivy-rajoniv"> Архівні відділи районних державних адміністрацій </a>
+                            </li> -->
+                            <!-- <li class="parent-sub-menu">
+                                <a class="nav-link" href="trydovi-arhivy"> Трудові архіви в районах </a>
+                            </li> -->
+                            <!-- <li class="parent-sub-menu">
+                                <a class="nav-link" href="miski-arhivy"> Архівні відділи міських рад </a>
+                            </li> -->
+                        </ul>
+                    </div>
+                    <div class="big-menu-item">
+                        <ul class="parent-big-sub-menu">
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="zvernennya-hromadyan"> Звернення громадян </a>
+                                <ul class="big-sub-menu">
+                                    <li><a href="socialno-pravovi-zapyty">Соціально-правові запити</a></li>
+                                    <li><a href="tematychni-zapyty">Тематичні запити</a></li>
+                                    <li><a href="henealohichni-zapyty">Генеалогічні запити</a></li>
+                                    <li><a href="perelik-cin">Перелік цін</a></li>
+                                    <li><a href="znahodzhennya-dokymentiv">Відомості про місце знаходження
+                                            документів</a></li>
+                                </ul>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="normatyvna-baza"> Нормативна база </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="halyzevi-prohramy"> Галузеві програми </a>
+                            </li>
+<!--                            <li class="parent-sub-menu">-->
+<!--                                <a class="nav-link" href="derzhavni-posluhy"> Державні послуги </a>-->
+<!--                            </li>-->
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="rozsekrechennya-dokumentiv"> Розсекречення документів </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="arhivy-y-zmi"> Архіви у ЗМІ </a>
+                                <ul class="big-sub-menu">
+                                    <li><a href="arhivy-na-tv">Архіви на радіо та телебаченні</a></li>
+                                    <li><a href="pyblikacii-v-presi">Публікації в пресі</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="big-menu-item">
+                        <ul class="parent-big-sub-menu">
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="fondy-online">Виставки On-line</a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="arhivi-represivnih-organiv-komunistichnogo-totalitarnogo-rez">Архіви репресивних органів комуністичного тоталітарного режиму 1917-1991 років</a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="dovidkovyj-aparat"> Довідковий апарат </a>
+                                <ul class="big-sub-menu">
+                                    <li><a class="nav-link" href="fondy-arhivy">Фонди архіву </a></li>
+                                    <a class="nav-link" href="#"> Е-архів </a>
+                                    <ul class="big-sub-menu">
+                                        <li><a class="nav-link" href="/family-search">Family Search</a></li>
+                                        <li><a class="nav-link" href="/ocifrovani-opisi/Дорадянський%20період">Описи</a></li>
+                                        <li><a class="nav-link" href="/ocifrovani-sprav">Справи</a></li>
+                                    </ul>
+                                    <!--                                <li class="parent-sub-menu">-->
+                                    <!--                                    <a class="nav-link" href="mizhnarodna-diyalnist"> Міжнародна діяльність </a>-->
+                                    <!--                                </li>-->
+                                </ul>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="mizhnarodna-diyalnist">Міжнародна діяльність </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="big-menu-item">
+                        <ul class="parent-big-sub-menu">
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="dostup-do-publichnoyi-informaciyi"> Доступ до публічної інформації </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="nashi-vydannya">Наші видання</a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="zapobigannya-proyavam-korupciyi">Запобігання проявам корупції</a>
+                                <ul class="big-sub-menu">
+                                    <li> <a class="nav-link" href="zapobihannya-korypcii">Повідомлення про корупцію</a></li>
+                                </ul>
+
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="spivpracya"> Співпраця </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="vakansiyi"> Вакансії </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="ochyshchennya-vlady"> Очищення влади </a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="vidkriti-dani">Відкриті дані</a>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="korisni-posilannya">Корисні посилання</a>
+                                <ul class="big-sub-menu">
+<!--                                    <li> <a class="nav-link" href="arhivi-zakordonom">Архіви закордоном</a></li>-->
+                                    <li> <a class="nav-link" href="arhivi-ukrayini">Архіви України</a></li>
+                                </ul>
+                            </li>
+                            <li class="parent-sub-menu">
+                                <a class="nav-link" href="karta-saity"> Карта сайту </a>
+                            </li>
+<!--                            <li class="parent-sub-menu">-->
+<!--                                <a class="nav-link" href="in-english"> In English </a>-->
+<!--                            </li>-->
+                        </ul>
+                        <div class="footer-eye-wrapper">
+                            <div class="footer-eye">
+                                <a class="bvi-open" href="#">
+                                    <img src="/media/images/header/eye-icon.png" alt="eye">
+                                    <p class="people-eye">Людям з <br> порушенням зору</p>
+                                </a>
+                            </div>
+                            <div class="footer-facebook">
+                                <a href="https://www.facebook.com/ArhivRivne" target="_blank" rel="noreferrer">
+                                    <img src="/media/images/header/fb.png" alt="facebook">
+                                    <p class="we-in-facebook">Ми у Facebook</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-center-wrapper">
+                <div class="footer-center-item">
+                    <img src="/media/images/home-page/LOGO.png" alt="logo">
+                </div>
+                <div class="footer-center-item">
+                    <p class="footer-center-title">Приймальня</p>
+                    <p class="footer-center-description">(0362) 67-15-14</p>
+                </div>
+                <div class="footer-center-item">
+                    <p class="footer-center-title">Для довідок</p>
+                    <p class="footer-center-description">(0362) 67-15-07, 67-15-13</p>
+                </div>
+                <div class="footer-center-item">
+                    <p class="footer-center-title">Електронна пошта</p>
+                    <p class="footer-center-description"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e28390818a8b9487bd9094a28390818acc858d94cc9783">[email&#160;protected]</a></p>
+                </div>
+                <div class="footer-center-item">
+                    <p class="footer-center-title">Адреса</p>
+                    <p class="footer-center-description">вул. С. Бандери, 26-а, м. Рівне <br> 33014, Україна</p>
+                </div>
+            </div>
+            <div class="footer-bottom-wrapper">
+                <div class="footer-bottom-items">
+                    <div class="site-in-beta-wrapper">
+                        <div class="site-in-beta-container">
+                            <div class="site-in-beta">
+                                <p>BETA</p>
+                            </div>
+                            <div class="site-in-beta-text">
+                                <p>Портал працює в тестовому режимі. Якщо ви маєте зауваження або пропозиції, будь
+                                    ласка, напишіть нам: <a href="archive_rv@arch.gov.ua"><span class="__cf_email__" data-cfemail="cdacbfaea5a4bba892bfbb8dacbfaea5e3aaa2bbe3b8ac">[email&#160;protected]</span></a></p>
+                            </div>
+                        </div>
+                        <div class="sponsor">
+                            <svg class="sponsor__icon" style="fill: #c9c4b1;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="110" height="88" viewBox="0 0 110 88" style="enable-background:new 0 0 110 88;" xml:space="preserve">
+                                <g>
+                                    <path d="M69.9,21.2l0.5-12.9h-2l-0.8,20.9h3.1c0,0,4.2-0.3,4.2-4.1C74.9,22.3,71.8,21.3,69.9,21.2z M69.6,27.6l0.2-4.9   c1.1,0,3,0,3,2.5C72.9,27,70.5,27.6,69.6,27.6z"/>
+                                    <path d="M63.5,13.6l2-0.2c0,0,0.8-5.5-3.1-5.3c-3.9,0-5,5.3-5,10.7c0,5.5,0.5,10.7,4.6,10.5c4.1-0.2,3.1-5.5,3.1-5.5L63,24   c0,0,0.8,3.1-0.9,3.1c-2.2,0-2.8-2.8-2.7-8.3c0.2-5.7,0.5-8.9,3-8.9C63.8,10,63.5,13.6,63.5,13.6z"/>
+                                    <path d="M19.2,23.8c-0.9-2.7-3.6-2.8-5-2.4l0.2-4.2c5.7-0.6,6-8.5,6-8.5h-2c0,6-3,6.9-3.8,6.9l0.2-6.8h-2L12,29.3h2l0.2-6.1   c4.4-1.4,3.9,6.1,3.9,6.1h2C20.1,29.2,20.4,27.3,19.2,23.8z"/>
+                                    <path d="M8.8,52.4c-0.9-2.7-3.6-2.8-5-2.4L4,45.7c6-0.6,6.1-8.8,6.1-8.8H8c0,6-3.1,7.1-4.1,7.1l0.2-7.1h-2L1.6,57.6h2l0.2-6.1   c4.4-1.4,3.9,6.1,3.9,6.1h2C9.8,57.6,10.1,55.7,8.8,52.4z"/>
+                                    <path d="M83.6,23.8c-0.9-2.7-3.6-2.8-5-2.4l0.2-4.2c5.7-0.6,6-8.5,6-8.5h-2c0,6-3,6.9-3.8,6.9L79,8.9h-2l-0.6,20.4h2l0.2-6.1   c4.4-1.4,3.9,6.1,3.9,6.1h2C84.4,29.2,84.8,27.3,83.6,23.8z"/>
+                                    <g>
+                                        <polygon points="23.6,29.3 21.7,29.3 22.3,9.1 24.4,9.1   "/>
+                                        <path d="M23.6,17.2c0,0,6.3,0.2,6.3-4.6c0-2.8-3.5-3.6-5.7-3.8c-1.1-0.2-1.9,0-1.9,0v1.6h1.9c0,0,3.8-0.5,3.8,2.4    c0,1.7-1.9,3-4.2,3L23.6,17.2z"/>
+                                    </g>
+                                    <g>
+                                        <polygon points="63.6,57.6 61.7,57.6 62.4,37.3 64.4,37.3   "/>
+                                        <path d="M63.6,45.5c0,0,6.3,0.2,6.3-4.6c0-2.8-3.5-3.6-5.7-3.8c-1.1-0.2-1.9,0-1.9,0v1.6h1.9c0,0,3.8-0.5,3.8,2.4    c0,1.7-1.9,3-4.2,3L63.6,45.5z"/>
+                                    </g>
+                                    <polygon points="42,29.2 39.9,29.2 40.7,8.8 42.9,8.8  "/>
+                                    <g>
+                                        <path d="M37.2,2L37.2,2L37.2,2c-0.9,0.3-1.9,0.9-1.9,2.4c0,2.2,1.7,2.8,2.8,3c0.3,0,0.5,0,0.5,0l0,0c0.2,0,0.3,0,0.5-0.2    c0.8-0.3,1.6-0.9,1.6-2.2C41,1.8,37.2,2,37.2,2z M38.8,5.9L38.8,5.9L38.8,5.9L38.8,5.9c-0.3,0.2-0.5,0.2-0.5,0    c-0.9,0-1.6-0.3-1.6-1.4c0-0.6,0.3-0.9,0.8-1.1c1.1,0,2,0.2,2,1.6C39.8,5.5,39.3,5.8,38.8,5.9z"/>
+                                    </g>
+                                    <g>
+                                        <path d="M44,2L44,2L44,2c-0.9,0.3-1.9,0.9-1.9,2.4c0,2.2,1.7,2.8,2.8,3c0.3,0,0.5,0,0.5,0l0,0c0.2,0,0.3,0,0.5-0.2    c0.8-0.3,1.6-0.9,1.6-2.2C47.8,1.8,44,2,44,2z M45.6,5.9L45.6,5.9L45.6,5.9L45.6,5.9c-0.3,0.2-0.5,0.2-0.5,0    c-0.9,0-1.6-0.3-1.6-1.4c0-0.6,0.3-0.9,0.8-1.1c1.1,0,2,0.2,2,1.6C46.4,5.5,46,5.8,45.6,5.9z"/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path d="M4.7,24L4.7,24L4.7,24c-1.1,0.3-2.2,1.1-2.2,2.8c0,2.7,2,3.3,3.5,3.5c0.5,0,0.6,0,0.6,0l0,0c0.2,0,0.5,0,0.6-0.2     c1.1-0.3,1.9-1.1,1.9-2.7C9.1,23.8,4.7,24,4.7,24z M6.5,28.5L6.5,28.5L6.5,28.5C6.5,28.5,6.5,28.7,6.5,28.5     c-0.3,0.2-0.5,0.2-0.6,0.2c-1.1,0-1.7-0.3-1.7-1.7c0-0.6,0.5-1.1,0.9-1.3c1.4,0,2.4,0.2,2.4,1.7C7.4,28.1,7.1,28.4,6.5,28.5z"/>
+                                        </g>
+                                        <path d="M8,8.8l0.2,5c0,1.6,0,2.5-0.2,3.8c-0.2,2-0.5,4.2-2.2,4.2s-2-2.8-2.2-4.2c0-0.6-0.2-1.4-0.2-3.8s0.2-4.9,0.2-4.9h-2    c0,0-0.2,3.1-0.2,4.9s0.2,3,0.2,3.8c0.3,3.8,1.1,5.8,4.2,5.8c2.8,0,3.9-2,4.2-5.8c0.2-1.6,0.2-2.5,0.2-3.9l-0.2-4.9H8z"/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path d="M15.3,52.4L15.3,52.4L15.3,52.4c-1.1,0.3-2.2,1.1-2.2,2.8c0,2.7,2,3.3,3.5,3.5c0.5,0,0.6,0,0.6,0l0,0     c0.2,0,0.5,0,0.6-0.2c1.1-0.3,1.9-1.1,1.9-2.7C19.7,52.1,15.3,52.4,15.3,52.4z M17,57L17,57L17,57L17,57c-0.3,0-0.5,0-0.6,0     c-1.1,0-1.7-0.3-1.7-1.7c0-0.6,0.5-1.1,0.9-1.3c1.4,0,2.4,0.2,2.4,1.7C17.9,56.5,17.5,56.8,17,57z"/>
+                                        </g>
+                                        <path d="M18.6,37l0.2,5c0,1.6,0,2.5-0.2,3.8c-0.2,2-0.5,4.2-2.2,4.2s-2-2.8-2.2-4.2c0-0.6-0.2-1.4-0.2-3.8c0-2.4,0.2-4.9,0.2-4.9    h-2c0,0-0.2,3.1-0.2,4.9s0.2,3,0.2,3.8c0.3,3.8,1.1,5.8,4.2,5.8c2.8,0,3.9-2,4.2-5.8c0.2-1.3,0.2-2.2,0.2-3.6l-0.2-4.9L18.6,37z"/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path d="M54.4,52.4L54.4,52.4L54.4,52.4c-1.1,0.3-2.2,1.1-2.2,2.8c0,2.7,2,3.3,3.5,3.5c0.5,0,0.6,0,0.6,0l0,0     c0.2,0,0.5,0,0.6-0.2c1.1-0.3,1.9-1.1,1.9-2.7C58.8,52.2,54.4,52.4,54.4,52.4z M56.1,57L56.1,57L56.1,57     C56.1,57.1,56.1,57.1,56.1,57c-0.3,0.2-0.5,0.2-0.6,0.2c-1.1,0-1.7-0.3-1.7-1.7c0-0.6,0.5-1.1,0.9-1.3c1.4,0,2.4,0.2,2.4,1.7     C57,56.5,56.6,56.8,56.1,57z"/>
+                                        </g>
+                                        <path d="M57.7,37.2l0.2,5c0,1.6,0,2.5-0.2,3.8c-0.2,2-0.5,4.2-2.2,4.2c-1.7,0-2-2.8-2.2-4.2c0-0.6-0.2-1.4-0.2-3.8    c0-2.4,0.2-4.9,0.2-4.9h-2c0,0-0.2,3.1-0.2,4.9s0.2,3,0.2,3.8c0.3,3.8,1.1,5.8,4.2,5.8c2.8,0,3.9-2,4.2-5.8    c0.2-1.3,0.2-2.2,0.2-3.6l-0.2-4.9L57.7,37.2z"/>
+                                    </g>
+                                    <polygon points="94.9,8.8 89.1,24.6 89.7,8.8 87.6,8.8 87,29.2 89.1,29.2 94.9,12.4 94.6,29.2 96.4,29.2 96.8,8.8  "/>
+                                    <polygon points="90.9,37.2 85.3,53 85.9,37.2 83.9,37.2 83.1,57.6 85.3,57.6 91.1,40.8 90.8,57.6 92.7,57.6 93,37.2  "/>
+                                    <g>
+                                        <polygon points="35.4,37.2 33.3,37 32.5,57.1 34.6,57.3   "/>
+                                        <path d="M34.4,48.9c0,0,6.3,0.3,6,5c-0.2,2.8-3.6,3.3-6,3.5c-1.1,0-1.9-0.2-1.9-0.2v-1.6l1.9,0.2c0,0,3.8,0.8,3.9-2.2    c0.2-1.7-1.6-3-4.1-3.1L34.4,48.9z"/>
+                                    </g>
+                                    <g>
+                                        <polygon points="45.1,57.4 43.2,57.4 43.7,37 45.6,37   "/>
+                                        <polygon points="40.2,37 48.9,36.9 48.9,38.4 40.2,38.6   "/>
+                                    </g>
+                                    <g>
+                                        <g>
+                                            <path d="M36,85.7l5.2-20.4l1.9,0.2c0,0,3.5,20.3,3.3,20.3h-2c0,0-2.8-16.6-2.8-16.5h-0.2c0,0-2.2,11.8-3.9,16.5L36,85.7z"/>
+                                        </g>
+                                        <polygon points="45.6,84.1 45.4,85.7 36.8,85.7 36.8,84.1   "/>
+                                    </g>
+                                    <path d="M23.4,74.9c0-1.4,0-2.4-0.2-3.1v-0.2l0,0c0-0.2,0-0.2,0-0.3c-0.3-3.8-1.1-5.8-4.2-5.8c-2.8,0-3.9,2-4.2,5.8   c-0.2,1.3-0.2,2.2-0.2,3.6v0.5c0,0.3,0,0.8,0,1.1c0,1.4,0,2.4,0.2,3.1v0.2l0,0c0,0.2,0,0.2,0,0.3c0.3,3.8,1.1,5.8,4.2,5.8   c2.8,0,3.9-2,4.2-5.8c0.2-1.3,0.2-2.2,0.2-3.6V76C23.4,75.5,23.4,75.2,23.4,74.9z M19.2,83.6c-1.7,0-2-2.4-2.2-3.8   c0,0-0.2-2.4-0.2-4.6c0-2.2,0.2-4.2,0.2-4.2c0.2-1.9,0.5-3.8,2.2-3.8s2,2.4,2.2,3.8c0,0,0.2,2.2,0.2,4.4c0,2.2-0.2,4.4-0.2,4.6   C21.1,81.9,20.9,83.6,19.2,83.6z"/>
+                                    <g>
+                                        <polygon points="31.4,21.2 35.8,20.7 36.1,22.3 31.3,22.4   "/>
+                                        <polygon points="38,29.2 35.4,8.8 33.2,8.6 29.2,29.2 31,29.2 33.9,12.8 34.1,12.8 35.8,29.2   "/>
+                                    </g>
+                                    <g>
+                                        <polygon points="7.6,85.8 5.7,85.8 5.8,65.4 7.9,65.4   "/>
+                                        <path d="M2.9,75.6c0-1.1-0.5-8.9,3.9-7.5v-1.6c-1.6-0.3-3.8-0.2-5,2.4c-0.9,2.4-0.9,5.3-0.9,6.8s0,4.1,0.9,6.1    c1.3,2.7,3.5,2.8,5,2.4v-1.6C2.5,84.1,2.9,76.7,2.9,75.6z"/>
+                                        <path d="M10.7,75.6c0-1.1,0.5-8.9-3.9-7.5v-1.6c1.6-0.3,3.8-0.2,5,2.4c0.9,2.2,0.9,5.2,0.9,6.6s0,4.1-0.9,6.1    c-1.3,2.7-3.5,2.8-5,2.4v-1.6C11,84.1,10.7,76.7,10.7,75.6z"/>
+                                    </g>
+                                    <g>
+                                        <polygon points="30.7,57.6 27.8,36.9 25.8,36.7 21.9,57.6 23.6,57.6 26.4,40.8 26.6,40.8 28.5,57.6   "/>
+                                    </g>
+                                    <polygon points="53.4,8.8 52.9,20.7 48.1,17.2 48.2,8.8 46.2,8.8 45.6,29.2 47.6,29.2 47.9,19.4 52.8,23 52.6,29.2 54.7,29.2    55.5,8.8  "/>
+                                    <polygon points="33.3,65 32.8,76.9 27.8,73.4 28.1,65 26.1,65 25.5,85.4 27.5,85.4 27.8,75.6 32.7,79.3 32.5,85.4 34.6,85.4    35.4,65  "/>
+                                    <polygon points="78.9,37.2 78.5,49.1 73.5,45.7 73.7,37.2 71.6,37.2 71.2,57.7 73.2,57.7 73.4,47.8 78.4,51.5 78.1,57.7 80.1,57.7    80.9,37.2  "/>
+                                    <g>
+                                        <polygon points="107,8.8 101.2,24.6 101.8,8.8 99.7,8.8 99.1,29.2 101.2,29.2 107.1,12.4 106.6,29.2 108.7,29.2 109,8.8   "/>
+                                        <g>
+                                            <path d="M105.7,4.8c0,0.9-0.2,1.9-1.3,1.9c-1.3,0-1.4-0.9-1.4-1.9L101.6,5c0.2,1.9,0.9,3.1,2.8,3.1c2.2,0,2.5-1.6,2.7-3.1     L105.7,4.8z"/>
+                                        </g>
+                                    </g>
+                                    <g>
+                                        <polygon points="103,37.2 97.4,53 98,37.2 96,37.2 95.2,57.6 97.2,57.6 103.2,40.8 102.9,57.6 104.8,57.6 105.1,37.2   "/>
+                                        <g>
+                                            <path d="M101.9,33.2c0,0.9-0.2,1.9-1.3,1.9c-1.3,0-1.4-0.9-1.4-1.9l-1.4,0.2c0.2,1.9,0.9,3.1,2.8,3.1c2.2,0,2.5-1.6,2.7-3.1     L101.9,33.2z"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                            <p class="sponsor__text">Веб-сайт розроблено за підтримки Українського культурного фонду</p>
+                        </div>
+                        <a href="https://vivasg.com" target="_blank">
+                            <div class="made-by-wrapper">
+                                <p class="made-by-text">Розроблено в</p>
+                                <!-- <img src="/media/images/home-page/codebe..png" alt="codebe"> -->
+                                <svg class="made-by-img" style="max-width: 80px;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 135.5 23.9" width="135.5" height="23.9" xml:space="preserve">
+                                    <g>
+                                        <path style="fill:#FFFFFF;" d="M25.6,12.1c0-1.1,0-2.5,0-2.7c0-0.5,0-1.1-0.1-1.6c-0.1-0.6-0.4-1.4-1-2c-0.6-0.7-1.3-1-1.9-1.2    c-0.6-0.2-1,0.2-1,0.5s0,0.3,0,1.1c0,0.8,0,2.3,0,2.3v5.3h0c0,1.1,0,2.5,0,2.7c0,0.5,0,1.1,0.1,1.6c0.1,0.6,0.4,1.4,1,2    c0.6,0.7,1.3,1,1.9,1.2c0.6,0.2,1-0.2,1-0.5c0-0.3,0-0.3,0-1.1c0-0.8,0-2.3,0-2.3L25.6,12.1L25.6,12.1z"/>
+                                        <path style="fill:#FFFFFF;" d="M15.9,4.3c-1.1,0.3-2.4,0.9-2.9,3.3c-0.5,2.4-1.4,6.2-1.8,7.6c-0.3,1.2-0.8,1.9-1.3,1.9    c-0.4,0-0.9-0.7-1.3-1.9C8.4,13.9,7.4,10,6.9,7.6c-0.5-2.4-1.8-3-2.9-3.3C3,4.1,2.1,4.1,2.3,5.1c0,0,1.8,8.4,2.9,11.8    c1.1,3.4,2.4,4.5,4.7,4.4l0,0c0,0,0,0,0,0s0,0,0,0l0,0c2.3,0,3.6-1,4.7-4.4c1.1-3.4,2.9-11.8,2.9-11.8C17.9,4.1,17,4.1,15.9,4.3z"/>
+                                        <path style="fill:#FFFFFF;" d="M42.5,4.3c-1.1,0.3-2.4,0.9-2.9,3.3c-0.5,2.4-1.4,6.2-1.8,7.6c-0.3,1.2-0.8,1.9-1.3,1.9    c-0.4,0-0.9-0.7-1.3-1.9c-0.4-1.4-1.3-5.3-1.8-7.6c-0.5-2.4-1.8-3-2.9-3.3c-1.1-0.3-2-0.3-1.7,0.8c0,0,1.8,8.4,2.9,11.8    c1.1,3.4,2.4,4.5,4.7,4.4l0,0c0,0,0,0,0,0s0,0,0,0l0,0c2.3,0,3.6-1,4.7-4.4c1.1-3.4,2.9-11.8,2.9-11.8C44.4,4.1,43.5,4.1,42.5,4.3    z"/>
+                                        <path style="fill:#FFFFFF;" d="M55.6,17.9c0,0-2.6,0.2-4.1-1.1c-1.5-1.2-2.2-3.1-1.5-5.5s2.7-3.4,4.9-3.4c2.1,0,3.7,1.5,4.2,3.1    s0.4,2.5,0.4,4.2s0,1.1,0,1.9s0.2,2,0.9,2.9c0.7,0.9,1.4,1.1,2,1.3s1.2-0.1,1.2-0.7c0-0.6,0-1.4,0-5s-0.1-5.8-1.3-7.6    c-1.2-1.8-3.4-3.1-5.9-3.6c-2.5-0.5-4.9,0.1-6.9,1.6s-3.5,3.8-3.6,6.9s1.4,5.6,2.9,6.8c1.5,1.3,2.9,1.5,4,1.7s2.7,0.1,3.6,0.1    s0.9-0.5,0.9-1.2s0.1-1.4-0.4-1.9C56.4,17.8,55.6,17.9,55.6,17.9z"/>
+                                        <path style="fill:#FFFFFF;" d="M96.5,3.7c-5,0-9,3.9-9,8.8s4,8.8,9,8.8c5,0,9-3.9,9-8.8S101.5,3.7,96.5,3.7z M96.5,17.7    c-2.6,0-4.8-2.3-4.8-5.1s2.1-5.1,4.8-5.1c2.6,0,4.8,2.3,4.8,5.1S99.2,17.7,96.5,17.7z"/>
+                                        <path style="fill:#FFFFFF;" d="M119.9,2.6L119.9,2.6c0-0.4-0.3-0.7-0.7-0.7h-3.8c-2.2,0-4.1,1.8-4.1,4.1v1.8c0,0.5-0.4,1-1,1h-2.2    c-0.5,0-0.9,0.4-0.9,0.9v1.5c0,0.5,0.4,0.9,0.9,0.9h2.2c0.5,0,1,0.4,1,1v7.5c0,0.5,0.4,0.9,0.9,0.9h2.2c0.5,0,0.9-0.4,0.9-0.9V13    c0-0.5,0.4-1,1-1h2.2c0.5,0,0.9-0.4,0.9-0.9V9.6c0-0.5-0.4-0.9-0.9-0.9h-2.3c-0.5,0-0.8-0.4-0.8-0.8V6.1c0-0.5,0.4-0.9,0.9-0.9h1    C118.7,5.2,119.9,4,119.9,2.6z"/>
+                                        <path style="fill:#FFFFFF;" d="M134.3,20.8v0.4c0,0.2-0.2,0.4-0.4,0.4h-3.7c-2.2,0-4.1-1.8-4.1-4.1v-4.4c0-0.5-0.4-1-1-1H123    c-0.5,0-0.9-0.4-0.9-0.9V9.8c0-0.5,0.4-0.9,0.9-0.9h2.2c0.5,0,1-0.4,1-1V3c0-0.5,0.4-0.9,0.9-0.9h2.2c0.5,0,0.9,0.4,0.9,0.9v4.9    c0,0.5,0.4,1,1,1h2.2c0.5,0,0.9,0.4,0.9,0.9v1.5c0,0.5-0.4,0.9-0.9,0.9h-2.2c-0.5,0-1,0.4-1,1v3.5c0,0.9,0.7,1.6,1.6,1.6l0,0    C133.2,18.3,134.3,19.4,134.3,20.8z"/>
+                                        <path style="fill:#FFFFFF;" d="M84.9,14.5c-0.4-0.8-0.9-1.4-1.2-1.6c-0.1-0.1-0.2-0.1-0.3-0.2h0c-0.3-0.2-0.6-0.4-0.9-0.5    c-0.6-0.3-1-0.5-2.2-1.1c0,0-1.6-0.9-2.1-1.4c-0.7-0.6-0.8-1.1-0.7-1.6c0.1-0.3,0.4-0.6,0.9-0.8c0.5-0.1,1.1-0.2,1.7-0.1    c0.8,0.1,1.5,0.4,1.7,0.4C82,7.8,82.4,8,82.9,8c0.6,0,1-0.5,1.2-0.8c0.2-0.3,0.4-0.5,0.6-0.8C85,6,85,5.4,84.4,5.1    c-0.5-0.3-2.2-1.1-4.1-1.2c-1.9-0.1-3.3,0.1-4.8,1.1c-1.2,0.7-2,2.2-2.2,3c-0.2,0.8-0.1,2.1,0.3,2.9c0.4,0.8,0.9,1.4,1.2,1.6    c0.1,0.1,0.2,0.1,0.3,0.2h0c0.3,0.2,0.6,0.4,0.9,0.5c0.6,0.3,1,0.5,2.2,1.1c0,0,1.6,0.8,2.1,1.4c0.5,0.5,0.7,1,0.6,1.5    c-0.1,0.5-0.7,0.9-1.1,1c-0.4,0.1-1.1,0.1-1.9-0.1c-0.8-0.2-1-0.3-1.2-0.4c-0.2-0.1-0.7-0.3-1.2-0.2c-0.6,0-1,0.5-1.2,0.8    c-0.2,0.3-0.4,0.5-0.6,0.8c-0.3,0.4-0.2,1,0.4,1.3c0.6,0.3,2.2,1,4,1c1.9,0.1,3.3-0.1,4.9-1c1.2-0.7,1.9-2.1,2.1-2.9    C85.4,16.6,85.3,15.3,84.9,14.5z"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="copywriting-wrapper">
+                        <p class="copywriting-title">© 2019. Державний архів Рівненської Області. Використання будь-яких
+                            матеріалів, що опубліковані на цьому сайті, дозволяється при умові вказання посилання (для
+                            інтернет-видань - гіперпосилання) на офіційний сайт Державного архіву Рівненської області
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    var mySwiper = new Swiper ('.header-swiper-start', {
+        loop: true,
+        navigation: {
+            nextEl: '.swiper-next',
+            prevEl: '.swiper-prev',
+        },
+    })
+
+    var mySwiper = new Swiper('.home-swiper-container', {
+        scrollbar: {
+            el: '.swiper-scrollbar',
+            hide: false,
+        },
+        navigation: {
+            nextEl: '.home-swiper-next',
+            prevEl: '.home-swiper-prev',
+        },
+        slidesPerView: 1,
+        spaceBetween: 30,
+        breakpoints: {
+            767: {
+                slidesPerView: 3,
+            },
+            600: {
+                slidesPerView: 2,
+            },
+        }
+    });
+
+    var mySwiper = new Swiper('.foundation-swiper', {
+        centeredSlides: false,
+        slidesPerView: 'auto',
+        navigation: {
+            nextEl: '.foundation-swiper-next',
+            prevEl: '.foundation-swiper-prev',
+        },
+        // slidesPerView: 1,
+        spaceBetween: 8,
+        breakpoints: {
+            767: {
+                spaceBetween: 30,
+            },
+        }
+    });
+
+    // initialization datepicker
+    $('.modal-datepicker').datepicker().data('datepicker');
+
+    $(".modal-phone").inputmask("(999) 999-99-99");
+
+
+
+    $('[data-fancybox="gallery"]').fancybox({
+        backFocus : false,
+        buttons : [
+            'download',
+            'slideShow',
+            'zoom',
+            'fullScreen',
+            'close'
+        ]
+    });
+
+    $(window).on('load', function () {
+        function startPreloader() {
+            for (var i = 1; i <= 100; i++) {
+                (function(count) {
+                    setTimeout(function() {
+                        if(count == 100) {
+                            $('.weather-wrapper').css({'opacity': '1'});
+                        }
+                    }, i * 8);
+                })(i);
+            }
+        }
+        startPreloader();
+    });
+
+</script>
+
+<!-- bvi -->
+<script src="media/js-compiled/library-js/responsivevoice.min.js"></script>
+<script src="media/js-compiled/library-js/js.cookie.js"></script>
+<script src="media/js-compiled/library-js/bvi-init.js"></script>
+<script src="media/js-compiled/library-js/bvi.min.js"></script>
+
+<!-- Google tag (gtag.js) --> 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FH4L456RWB"></script> 
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date()); 
+    gtag('config', 'G-FH4L456RWB'); 
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d591cc14de6bbde',t:'MTc3MjM3ODA3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
