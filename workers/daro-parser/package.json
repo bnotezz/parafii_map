@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "deploy": "wrangler deploy --env production",
+        "deploy": "wrangler deploy index.js --env production",
         "test": "node --experimental-vm-modules node_modules/.bin/jest"
     },
     "devDependencies": {
