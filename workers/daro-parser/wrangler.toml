@@ -1,6 +1,6 @@
 name = "daro-parser-worker"
 main = "index.js"
-compatibility_date = "2025-05-16"
+compatibility_date = "2026-02-24"
 workers_dev = true
 
 [triggers]
