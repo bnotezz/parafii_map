@@ -1,6 +1,5 @@
 name = "daro-parser-worker"        # назва вашого Worker
 main = "index.js"
-type = "javascript"
 compatibility_date = "2025-05-16"
 workers_dev = true                    # якщо пушити у worker.dev піддомен
 
