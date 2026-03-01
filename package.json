@@ -13,9 +13,8 @@
     "preview": "npm run pages:build && opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "npm run pages:build && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "npm run pages:build && opennextjs-cloudflare build && opennextjs-cloudflare upload",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "deploy:worker": "npx wrangler deploy --config workers/daro-parser/wrangler.toml --env production"
-  },
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+},
   "dependencies": {
     "@next/third-parties": "latest",
     "@opennextjs/cloudflare": "^1.14.7",
