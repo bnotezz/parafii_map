@@ -17,19 +17,22 @@ export async function handleSchedule(env) {
   }
 }
 
-// HTTP trigger allows manual invocation (e.g. call URL after deploy)
-export async function fetch(request, env, context) {
-  // if tests or manual callers want to avoid doing work, set SKIP_SCHEDULE
-  if (env && env.SKIP_SCHEDULE) {
-    return new Response("OK", { status: 200 });
-  }
-  // run the same schedule logic; we don't care about response body
-  context.waitUntil(handleSchedule(env));
-  return new Response("OK", { status: 200 });
-}
-
 export default {
-  // invoked by cron trigger
+  async fetch(request, env, context) {
+    const url = new URL(request.url);
+    
+    if (env.SKIP_SCHEDULE) {
+      return new Response("OK", { status: 200 });
+    }
+
+    if (url.pathname !== `/trigger/${env.WORKER_TRIGGER_SECRET}`) {
+      return new Response("Not Found", { status: 404 });
+    }
+
+    context.waitUntil(handleSchedule(env));
+    return new Response("OK", { status: 200 });
+  },
+
   async scheduled(event, env, context) {
     context.waitUntil(handleSchedule(env));
   }

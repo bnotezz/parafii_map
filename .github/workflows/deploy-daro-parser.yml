@@ -35,3 +35,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      
+      - name: Trigger worker
+        run: curl https://daro-parser-worker.bnotezz.workers.dev/trigger/${{ secrets.WORKER_TRIGGER_SECRET }}
