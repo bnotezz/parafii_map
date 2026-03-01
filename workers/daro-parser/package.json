@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "deploy": "wrangler deploy index.js --config ./wrangler.toml --env production",
+        "deploy": "wrangler deploy index.js --config ./wrangler.toml",
         "test": "node --experimental-vm-modules node_modules/.bin/jest"
     },
     "devDependencies": {
