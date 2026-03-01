@@ -9,5 +9,9 @@ crons = ["0 0 1,15 * *"]
 [observability.logs]
 enabled = true
 
+[[browser]]
+binding = "BROWSER"
+
 [env.production]
+name = "daro-parser-worker"
 vars = { GITHUB_FILE_PATH = "data/fond_P720.json" }

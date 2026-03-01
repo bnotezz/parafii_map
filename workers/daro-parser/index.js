@@ -4,7 +4,7 @@ export * from "./lib.js";
 // orchestrate the worker's scheduled execution
 export async function handleSchedule(env) {
   try {
-    const cases = await downloadAndParseCases();
+    const cases = await downloadAndParseCases(env);
     if (cases.length === 0) {
       console.error("Parsing error: No cases were parsed.");
       return;

@@ -6,6 +6,9 @@
         "deploy": "wrangler deploy index.js --config ./wrangler.toml",
         "test": "node --experimental-vm-modules node_modules/.bin/jest"
     },
+    "dependencies": {
+        "@cloudflare/puppeteer": "^0.0.5"
+    },
     "devDependencies": {
         "jest": "^29.6.2",
         "jest-environment-jsdom": "^29.6.2",
