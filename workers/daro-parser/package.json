@@ -3,9 +3,8 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "deploy": "wrangler publish --env production",
-        "test": "node --experimental-vm-modules node_modules/.bin/jest",
-        "test:integration": "SKIP_INTEGRATION=0 node --experimental-vm-modules node_modules/.bin/jest lib.integration.test.js"
+        "deploy": "wrangler deploy --env production",
+        "test": "node --experimental-vm-modules node_modules/.bin/jest"
     },
     "devDependencies": {
         "jest": "^29.6.2",
