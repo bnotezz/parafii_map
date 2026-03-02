@@ -9,7 +9,7 @@ crons = ["0 0 1,15 * *"]
 [observability.logs]
 enabled = true
 
-[[browser]]
+[browser]
 binding = "BROWSER"
 
 [env.production]
