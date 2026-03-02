@@ -4,14 +4,12 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// support __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const FIXTURES_DIR = path.join(__dirname, "tests", "fixtures");
 
-// ─── Mock @cloudflare/puppeteer before any lib imports ───────────────────────
-// jest.unstable_mockModule is required for ESM mocking
+// ─── Mock @cloudflare/puppeteer before any lib imports ────────────────────────
 let mockPageContent = "";
 
 jest.unstable_mockModule("@cloudflare/puppeteer", () => ({
@@ -28,7 +26,7 @@ jest.unstable_mockModule("@cloudflare/puppeteer", () => ({
   },
 }));
 
-// ─── Dynamic imports (must come AFTER unstable_mockModule calls) ──────────────
+// ─── Dynamic imports (must come AFTER unstable_mockModule) ────────────────────
 const {
   parseOpysList,
   parseCases,
@@ -42,20 +40,17 @@ const {
 
 const worker = await import("./index.js");
 
-// ─── fetch mock setup ─────────────────────────────────────────────────────────
+// ─── Fetch mock setup ─────────────────────────────────────────────────────────
 beforeAll(() => {
   fetchMock.enableMocks();
 });
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  mockPageContent = ""; // reset browser mock content before each test
+  mockPageContent = "";
 });
 
-// ─── Fake env with BROWSER binding ───────────────────────────────────────────
-const makeBrowserEnv = () => ({
-  BROWSER: {}, // puppeteer.launch receives this; our mock ignores it
-});
+const makeBrowserEnv = () => ({ BROWSER: {} });
 
 // ─── Parsing helpers ──────────────────────────────────────────────────────────
 describe("parsing helpers with HTML snapshots", () => {
@@ -66,10 +61,8 @@ describe("parsing helpers with HTML snapshots", () => {
     const list = parseOpysList(mainHtml);
     expect(Array.isArray(list)).toBe(true);
     expect(list.length).toBe(6);
-
     expect(list[0].opysNumber).toBe("4");
     expect(list[0].opysUrl).toMatch(/annotation=6$/);
-
     list.forEach((o) => {
       expect(o).toHaveProperty("opysNumber");
       expect(o).toHaveProperty("opysUrl");
@@ -81,12 +74,9 @@ describe("parsing helpers with HTML snapshots", () => {
     const opysList = parseOpysList(mainHtml);
     expect(opysList.length).toBeGreaterThan(0);
 
-    // Make the mocked browser page return the opys fixture for every page load
     mockPageContent = opysHtml;
 
-    const env = makeBrowserEnv();
-    const cases = await parseCases(opysList, env);
-
+    const cases = await parseCases(opysList, makeBrowserEnv());
     expect(Array.isArray(cases)).toBe(true);
     expect(cases.length).toBeGreaterThan(10);
 
@@ -95,13 +85,31 @@ describe("parsing helpers with HTML snapshots", () => {
     expect(cases[0].name).toMatch(/Березно/);
     expect(cases[0].url).toMatch(/\/upload\/2021\/April\/OElzU21ITG1HSEExQlE9PQ\.pdf$/);
 
-    cases.forEach((caseItem) => {
-      expect(caseItem).toHaveProperty("opys");
-      expect(caseItem).toHaveProperty("sprava");
-      expect(caseItem).toHaveProperty("name");
-      expect(caseItem).toHaveProperty("url");
-      expect(caseItem.url).toMatch(/^https?:\/\//);
+    cases.forEach((c) => {
+      expect(c).toHaveProperty("opys");
+      expect(c).toHaveProperty("sprava");
+      expect(c).toHaveProperty("name");
+      expect(c).toHaveProperty("url");
+      expect(c.url).toMatch(/^https?:\/\//);
     });
+  });
+
+  test("parseCases resets regex correctly across multiple opys pages", async () => {
+    // Two opys entries using the same fixture HTML.
+    // Before the bug fix, the shared /g regex lastIndex was left at end-of-string
+    // after the first page, causing the second page to yield 0 matches.
+    const opysList = [
+      { opysNumber: "4", opysUrl: "https://rv.archives.gov.ua/opys/1" },
+      { opysNumber: "5", opysUrl: "https://rv.archives.gov.ua/opys/2" },
+    ];
+    mockPageContent = opysHtml;
+
+    const cases = await parseCases(opysList, makeBrowserEnv());
+    const opys4Cases = cases.filter((c) => c.opys === "4");
+    const opys5Cases = cases.filter((c) => c.opys === "5");
+
+    expect(opys4Cases.length).toBeGreaterThan(0);
+    expect(opys5Cases.length).toBe(opys4Cases.length);
   });
 
   test("fetchMainPage returns HTML via browser binding", async () => {
@@ -119,8 +127,13 @@ describe("parsing helpers with HTML snapshots", () => {
 
 // ─── Encoding helpers ─────────────────────────────────────────────────────────
 describe("encoding helpers", () => {
-  test("utf8ToBase64 and base64ToUtf8 round-trip", () => {
-    const plain = "Hello, 世界";
+  test("utf8ToBase64 and base64ToUtf8 round-trip ASCII", () => {
+    const plain = "Hello, world!";
+    expect(base64ToUtf8(utf8ToBase64(plain))).toBe(plain);
+  });
+
+  test("utf8ToBase64 and base64ToUtf8 round-trip Unicode", () => {
+    const plain = "Привіт, 世界";
     expect(base64ToUtf8(utf8ToBase64(plain))).toBe(plain);
   });
 });
@@ -152,22 +165,54 @@ describe("github update logic", () => {
       ['{"content":"ignored"}', { status: 200 }]
     );
 
-    const newContent = "{}";
-    await expect(updateGithubFile(env, newContent, 0)).resolves.toBeUndefined();
+    await expect(updateGithubFile(env, "{}", 0)).resolves.toBeUndefined();
 
     const putCall = fetchMock.mock.calls[1];
     expect(putCall[0]).toMatch(/repos\/owner\/repo\/contents\//);
     expect(putCall[1].method).toBe("PUT");
     const body = JSON.parse(putCall[1].body);
-    expect(body.content).toBe(utf8ToBase64(newContent));
+    expect(body.content).toBe(utf8ToBase64("{}"));
+    expect(body.sha).toBeUndefined();
+    expect(body.message).toBe("created fond_P720.json");
+  });
+
+  test("updates file when content has changed", async () => {
+    const existingBase64 = utf8ToBase64("old content");
+    fetchMock.mockResponses(
+      [JSON.stringify({ sha: "abc123", content: existingBase64 }), { status: 200 }],
+      ['{"content":"ignored"}', { status: 200 }]
+    );
+
+    await expect(updateGithubFile(env, "new content", 5)).resolves.toBeUndefined();
+
+    expect(fetchMock.mock.calls.length).toBe(2);
+    const body = JSON.parse(fetchMock.mock.calls[1][1].body);
+    expect(body.sha).toBe("abc123");
+    expect(body.content).toBe(utf8ToBase64("new content"));
+    expect(body.message).toContain("5 справ");
   });
 
   test("skips update when content is unchanged", async () => {
     const existingBase64 = utf8ToBase64("same");
-    fetchMock.mockResponses([JSON.stringify({ sha: "abc", content: existingBase64 }), { status: 200 }]);
+    fetchMock.mockResponses(
+      [JSON.stringify({ sha: "abc", content: existingBase64 }), { status: 200 }]
+    );
 
     await expect(updateGithubFile(env, "same", 1)).resolves.toBeUndefined();
     expect(fetchMock.mock.calls.length).toBe(1);
+  });
+
+  test("throws when GET returns unexpected error", async () => {
+    fetchMock.mockResponses(["Server error", { status: 500 }]);
+    await expect(updateGithubFile(env, "content", 0)).rejects.toThrow("Failed to fetch GitHub file info");
+  });
+
+  test("throws when PUT fails", async () => {
+    fetchMock.mockResponses(
+      ["Not found", { status: 404 }],
+      ["Unauthorized", { status: 401 }]
+    );
+    await expect(updateGithubFile(env, "content", 0)).rejects.toThrow("Failed to update GitHub file");
   });
 });
 
@@ -176,38 +221,48 @@ describe("worker fetch handler", () => {
   const workerFetch = worker.default.fetch.bind(worker.default);
 
   test("returns 200 OK when SKIP_SCHEDULE is set", async () => {
-    const dummyContext = { waitUntil: jest.fn() };
+    const ctx = { waitUntil: jest.fn() };
     const resp = await workerFetch(
       new Request("https://example.com/"),
       { SKIP_SCHEDULE: "1" },
-      dummyContext
+      ctx
     );
     expect(resp.status).toBe(200);
-    expect(dummyContext.waitUntil).not.toHaveBeenCalled();
+    expect(ctx.waitUntil).not.toHaveBeenCalled();
   });
 
   test("returns 404 for unknown paths", async () => {
-    const dummyContext = { waitUntil: jest.fn() };
+    const ctx = { waitUntil: jest.fn() };
     const resp = await workerFetch(
       new Request("https://example.com/unknown"),
       { WORKER_TRIGGER_SECRET: "secret123" },
-      dummyContext
+      ctx
     );
     expect(resp.status).toBe(404);
-    expect(dummyContext.waitUntil).not.toHaveBeenCalled();
+    expect(ctx.waitUntil).not.toHaveBeenCalled();
   });
 
-  test("triggers schedule on correct secret path", async () => {
-    const dummyContext = { waitUntil: jest.fn() };
-    // fetchMainPage will be called inside handleSchedule - mock the browser content
+  test("returns 404 when secret in URL does not match", async () => {
+    const ctx = { waitUntil: jest.fn() };
+    const resp = await workerFetch(
+      new Request("https://example.com/trigger/wrong-secret"),
+      { WORKER_TRIGGER_SECRET: "correct-secret" },
+      ctx
+    );
+    expect(resp.status).toBe(404);
+    expect(ctx.waitUntil).not.toHaveBeenCalled();
+  });
+
+  test("triggers schedule and returns 200 on correct secret path", async () => {
+    const ctx = { waitUntil: jest.fn() };
     mockPageContent = "<html></html>";
 
     const resp = await workerFetch(
       new Request("https://example.com/trigger/secret123"),
       { WORKER_TRIGGER_SECRET: "secret123", ...makeBrowserEnv() },
-      dummyContext
+      ctx
     );
     expect(resp.status).toBe(200);
-    expect(dummyContext.waitUntil).toHaveBeenCalledTimes(1);
+    expect(ctx.waitUntil).toHaveBeenCalledTimes(1);
   });
 });
