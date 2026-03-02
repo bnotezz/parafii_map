@@ -14,4 +14,5 @@ binding = "BROWSER"
 
 [env.production]
 name = "daro-parser-worker"
+compatibility_flags = ["nodejs_compat"]
 vars = { GITHUB_FILE_PATH = "data/fond_P720.json" }
