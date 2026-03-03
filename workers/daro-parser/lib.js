@@ -22,7 +22,21 @@ export async function fetchPageWithBrowser(url, env, referer = null) {
 
     await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
+    // If we landed on the Cloudflare challenge page, wait for it to resolve
+    // and navigate to the real page automatically
+    const title = await page.title();
+    if (title.includes("зачекайте") || title.includes("Just a moment")) {
+      console.log("   ⏳ Cloudflare challenge detected, waiting for redirect...");
+      await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 20000 });
+    }
+
     const html = await page.content();
+
+    // Final check — if still on challenge page, throw so caller can handle it
+    if (html.includes("Трохи зачекайте") || html.includes("Just a moment")) {
+      throw new Error(`Cloudflare challenge not resolved for ${url}`);
+    }
+
     console.log(`   ✅ Received: ${html.length} bytes`);
     return html;
   } finally {
