@@ -42,4 +42,4 @@ jobs:
           curl -X POST \
             "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/workers/scripts/daro-parser-worker/schedules/dispatch" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            -H "Content-Type: application/json
+            -H "Content-Type: application/json"
