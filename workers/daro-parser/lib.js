@@ -60,11 +60,22 @@ export function parseOpysList(html) {
     const opysUrl = new URL(match[2].trim(), MAIN_URL).href;
     opysList.push({ opysNumber, opysUrl });
   }
+  
+  if(opysList.length === 0) {
+    console.error("No opys entries found in main page HTML. Here's a snippet:", { htmlSnippet: html.slice(0, 500) });
+  }
+  else {
+    console.log(`   ✅ Found ${opysList.length} opys entries`);
+  }
   return opysList;
 }
 
 export async function parseCases(opysList, env) {
   const cases = [];
+  if (opysList.length === 0) {
+    console.warn("No opys entries found – skipping case parsing");
+    return cases;
+  }
   for (const { opysNumber, opysUrl } of opysList) {
     const opysHtml = await fetchOpysPage(opysUrl, env);
     // Regex must be recreated per page — reusing a /g regex across different
@@ -72,15 +83,19 @@ export async function parseCases(opysList, env) {
     const caseRegex =
       /<tr>\s*<td[^>]*>\s*(\d+)\s*<\/td>\s*<td[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?<p[^>]*>\s*([^<]+?)\s*<\/p>[\s\S]*?<\/a>/g;
     let cMatch;
+    const pageCases = [];
     while ((cMatch = caseRegex.exec(opysHtml))) {
-      cases.push({
+      pageCases.push({
         opys: opysNumber,
         sprava: cMatch[1].trim(),
         name: cMatch[3].trim(),
         url: new URL(cMatch[2].trim(), opysUrl).href,
       });
     }
+    console.log(`   ✅ Found ${pageCases.length} cases`);
+    cases.push(...pageCases);
   }
+  console.log(`   ✅ Parsed ${cases.length} cases`);
   return cases;
 }
 
