@@ -37,5 +37,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Wait for propagation
         run: sleep 10
-      - name: Trigger worker
-        run: curl -f https://daro-parser-worker.bnotezz.workers.dev/trigger/${{ secrets.WORKER_TRIGGER_SECRET }}
+      - name: Trigger scheduled event
+        run: |
+          curl -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/workers/scripts/daro-parser-worker/schedules/dispatch" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json
