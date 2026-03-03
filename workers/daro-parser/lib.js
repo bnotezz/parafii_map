@@ -22,18 +22,26 @@ export async function fetchPageWithBrowser(url, env, referer = null) {
 
     await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
-    // If we landed on the Cloudflare challenge page, wait for it to resolve
-    // and navigate to the real page automatically
-    const title = await page.title();
-    if (title.includes("зачекайте") || title.includes("Just a moment")) {
-      console.log("   ⏳ Cloudflare challenge detected, waiting for redirect...");
-      await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 20000 });
+    // Wait for Cloudflare challenge to resolve — it rewrites the page in-place
+    // without triggering a navigation event, so we poll the title instead.
+    const CHALLENGE_TITLES = ["зачекайте", "Just a moment"];
+    const isChallenge = (t) => CHALLENGE_TITLES.some((s) => t.includes(s));
+
+    let title = await page.title();
+    if (isChallenge(title)) {
+      console.log("   ⏳ Cloudflare challenge detected, waiting for resolution...");
+      await page.waitForFunction(
+        (phrases) => !phrases.some((p) => document.title.includes(p)),
+        { timeout: 30000, polling: 500 },
+        CHALLENGE_TITLES
+      );
+      // Let the real page finish loading after challenge resolves
+      await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
     }
 
     const html = await page.content();
 
-    // Final check — if still on challenge page, throw so caller can handle it
-    if (html.includes("Трохи зачекайте") || html.includes("Just a moment")) {
+    if (isChallenge(await page.title())) {
       throw new Error(`Cloudflare challenge not resolved for ${url}`);
     }
 
