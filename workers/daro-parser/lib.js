@@ -3,72 +3,68 @@ import puppeteer from "@cloudflare/puppeteer";
 export const MAIN_URL = "https://rv.archives.gov.ua/ocifrovani-sprav?period=5&fund=5";
 export const GITHUB_API_BASE = "https://api.github.com";
 
-export async function fetchPageWithBrowser(url, env, referer = null) {
+// Single browser instance reused across all page fetches in one run
+export async function fetchPageWithBrowser(page, url, referer = null) {
   console.log(`\n🌐 fetchPageWithBrowser: ${url}`);
 
+  await page.setExtraHTTPHeaders({
+    "Accept-Language": "uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    ...(referer ? { "Referer": referer } : {}),
+  });
+
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  );
+
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+
+  const CHALLENGE_TITLES = ["зачекайте", "Just a moment"];
+  const isChallenge = (t) => CHALLENGE_TITLES.some((s) => t.includes(s));
+
+  let title = await page.title();
+  if (isChallenge(title)) {
+    console.log("   ⏳ Cloudflare challenge detected, waiting for resolution...");
+    await page.waitForFunction(
+      (phrases) => !phrases.some((p) => document.title.includes(p)),
+      { timeout: 30000, polling: 500 },
+      CHALLENGE_TITLES
+    );
+    await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
+  }
+
+  const html = await page.content();
+
+  if (isChallenge(await page.title())) {
+    throw new Error(`Cloudflare challenge not resolved for ${url}`);
+  }
+
+  console.log(`   ✅ Received: ${html.length} bytes`);
+  return html;
+}
+
+export async function fetchMainPage(page) {
+  return fetchPageWithBrowser(page, MAIN_URL);
+}
+
+export async function fetchOpysPage(opysUrl, page) {
+  return fetchPageWithBrowser(page, opysUrl, MAIN_URL);
+}
+
+export async function downloadAndParseCases(env) {
   const browser = await puppeteer.launch(env.BROWSER);
   try {
     const page = await browser.newPage();
 
-    await page.setExtraHTTPHeaders({
-      "Accept-Language": "uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-      ...(referer ? { "Referer": referer } : {}),
-    });
-
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    );
-
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
-
-    // Wait for Cloudflare challenge to resolve — it rewrites the page in-place
-    // without triggering a navigation event, so we poll the title instead.
-    const CHALLENGE_TITLES = ["зачекайте", "Just a moment"];
-    const isChallenge = (t) => CHALLENGE_TITLES.some((s) => t.includes(s));
-
-    let title = await page.title();
-    if (isChallenge(title)) {
-      console.log("   ⏳ Cloudflare challenge detected, waiting for resolution...");
-      await page.waitForFunction(
-        (phrases) => !phrases.some((p) => document.title.includes(p)),
-        { timeout: 30000, polling: 500 },
-        CHALLENGE_TITLES
-      );
-      // Let the real page finish loading after challenge resolves
-      await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
-    }
-
-    const html = await page.content();
-
-    if (isChallenge(await page.title())) {
-      throw new Error(`Cloudflare challenge not resolved for ${url}`);
-    }
-
-    console.log(`   ✅ Received: ${html.length} bytes`);
-    return html;
-  } finally {
-    await browser.close();
-  }
-}
-
-export async function fetchMainPage(env) {
-  return fetchPageWithBrowser(MAIN_URL, env);
-}
-
-export async function fetchOpysPage(opysUrl, env) {
-  return fetchPageWithBrowser(opysUrl, env, MAIN_URL);
-}
-
-export async function downloadAndParseCases(env) {
-  try {
-    const html = await fetchMainPage(env);
+    const html = await fetchMainPage(page);
     const opysList = parseOpysList(html);
-    const cases = await parseCases(opysList, env);
+    const cases = await parseCases(opysList, page);
     return cases;
   } catch (err) {
     console.error("Error during parsing or updating:", err);
     return [];
+  } finally {
+    await browser.close();
   }
 }
 
@@ -92,14 +88,14 @@ export function parseOpysList(html) {
   return opysList;
 }
 
-export async function parseCases(opysList, env) {
+export async function parseCases(opysList, page) {
   const cases = [];
   if (opysList.length === 0) {
     console.warn("No opys entries found – skipping case parsing");
     return cases;
   }
   for (const { opysNumber, opysUrl } of opysList) {
-    const opysHtml = await fetchOpysPage(opysUrl, env);
+    const opysHtml = await fetchOpysPage(opysUrl, page);
     // Regex must be recreated per page — reusing a /g regex across different
     // strings carries over lastIndex and silently skips matches.
     const caseRegex =

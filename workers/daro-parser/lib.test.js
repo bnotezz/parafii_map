@@ -11,16 +11,22 @@ const FIXTURES_DIR = path.join(__dirname, "tests", "fixtures");
 
 // ─── Mock @cloudflare/puppeteer before any lib imports ────────────────────────
 let mockPageContent = "";
+let mockPageTitle = "archive";
+
+const makeMockPage = () => ({
+  setExtraHTTPHeaders: jest.fn(),
+  setUserAgent: jest.fn(),
+  goto: jest.fn(),
+  content: jest.fn().mockImplementation(async () => mockPageContent),
+  title: jest.fn().mockImplementation(async () => mockPageTitle),
+  waitForFunction: jest.fn().mockResolvedValue(undefined),
+  waitForNetworkIdle: jest.fn().mockResolvedValue(undefined),
+});
 
 jest.unstable_mockModule("@cloudflare/puppeteer", () => ({
   default: {
     launch: jest.fn().mockImplementation(async () => ({
-      newPage: async () => ({
-        setExtraHTTPHeaders: jest.fn(),
-        setUserAgent: jest.fn(),
-        goto: jest.fn(),
-        content: jest.fn().mockImplementation(async () => mockPageContent),
-      }),
+      newPage: async () => makeMockPage(),
       close: jest.fn(),
     })),
   },
@@ -48,9 +54,8 @@ beforeAll(() => {
 beforeEach(() => {
   fetchMock.resetMocks();
   mockPageContent = "";
+  mockPageTitle = "archive";
 });
-
-const makeBrowserEnv = () => ({ BROWSER: {} });
 
 // ─── Parsing helpers ──────────────────────────────────────────────────────────
 describe("parsing helpers with HTML snapshots", () => {
@@ -76,7 +81,7 @@ describe("parsing helpers with HTML snapshots", () => {
 
     mockPageContent = opysHtml;
 
-    const cases = await parseCases(opysList, makeBrowserEnv());
+    const cases = await parseCases(opysList, makeMockPage());
     expect(Array.isArray(cases)).toBe(true);
     expect(cases.length).toBeGreaterThan(10);
 
@@ -104,7 +109,7 @@ describe("parsing helpers with HTML snapshots", () => {
     ];
     mockPageContent = opysHtml;
 
-    const cases = await parseCases(opysList, makeBrowserEnv());
+    const cases = await parseCases(opysList, makeMockPage());
     const opys4Cases = cases.filter((c) => c.opys === "4");
     const opys5Cases = cases.filter((c) => c.opys === "5");
 
@@ -114,13 +119,13 @@ describe("parsing helpers with HTML snapshots", () => {
 
   test("fetchMainPage returns HTML via browser binding", async () => {
     mockPageContent = mainHtml;
-    const html = await fetchMainPage(makeBrowserEnv());
+    const html = await fetchMainPage(makeMockPage());
     expect(html).toBe(mainHtml);
   });
 
   test("fetchOpysPage returns HTML via browser binding", async () => {
     mockPageContent = opysHtml;
-    const html = await fetchOpysPage("https://rv.archives.gov.ua/opys/1", makeBrowserEnv());
+    const html = await fetchOpysPage("https://rv.archives.gov.ua/opys/1", makeMockPage());
     expect(html).toBe(opysHtml);
   });
 });
@@ -259,7 +264,7 @@ describe("worker fetch handler", () => {
 
     const resp = await workerFetch(
       new Request("https://example.com/trigger/secret123"),
-      { WORKER_TRIGGER_SECRET: "secret123", ...makeBrowserEnv() },
+      { WORKER_TRIGGER_SECRET: "secret123", BROWSER: {} },
       ctx
     );
     expect(resp.status).toBe(200);
