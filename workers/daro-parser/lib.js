@@ -17,20 +17,26 @@ export async function fetchPageWithBrowser(page, url, referer = null) {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
   );
 
-  await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
   const CHALLENGE_TITLES = ["зачекайте", "Just a moment"];
   const isChallenge = (t) => CHALLENGE_TITLES.some((s) => t.includes(s));
 
-  let title = await page.title();
+  const title = await page.title();
   if (isChallenge(title)) {
-    console.log("   ⏳ Cloudflare challenge detected, waiting for resolution...");
-    await page.waitForFunction(
-      (phrases) => !phrases.some((p) => document.title.includes(p)),
-      { timeout: 30000, polling: 500 },
-      CHALLENGE_TITLES
-    );
-    await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
+    console.log("   ⏳ Cloudflare challenge detected, waiting up to 60s...");
+    try {
+      await page.waitForFunction(
+        (phrases) => !phrases.some((p) => document.title.includes(p)),
+        { timeout: 60000, polling: 1000 },
+        CHALLENGE_TITLES
+      );
+      await page.waitForNetworkIdle({ timeout: 15000 }).catch(() => {});
+    } catch (e) {
+      const snippet = (await page.content()).slice(0, 300);
+      console.error("Challenge not resolved. Page snippet:", snippet);
+      throw new Error(`Cloudflare challenge not resolved for ${url}`);
+    }
   }
 
   const html = await page.content();
