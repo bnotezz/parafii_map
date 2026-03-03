@@ -1,0 +1,47 @@
+name: Archive Scraper
+
+on:
+  schedule:
+    - cron: '0 0 1,15 * *'
+  workflow_dispatch:
+
+jobs:
+  scrape-and-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25.x' # Updated to match your local Node 25 environment
+
+      - name: Install Scraper Dependencies
+        working-directory: ./scraper
+        run: npm install
+
+      - name: Run Scrapers
+        working-directory: ./scraper
+        env:
+          SCRAPE_DO_TOKEN: ${{ secrets.SCRAPE_DO_TOKEN }}
+        run: npm run start
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git add ../data/fond_P720.json
+          git add ../data/jewarchive.json
+          
+          if git diff --staged --quiet; then
+            echo "🛑 No changes detected in the data files. Skipping commit."
+          else
+            git commit -m "Auto-update: Archive data files (Rivne & JewArchive) [skip ci]"
+            git push
+            echo "🎉 Successfully committed and pushed new data."
+          fi

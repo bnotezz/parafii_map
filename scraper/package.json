@@ -1,0 +1,22 @@
+{
+  "name": "archive-scraper",
+  "version": "1.0.0",
+  "description": "Puppeteer scraper for Rivne archives",
+  "main": "scraper.ts",
+  "scripts": {
+    "start": "ts-node scraper.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
