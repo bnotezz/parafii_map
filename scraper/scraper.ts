@@ -10,6 +10,10 @@ const SCRAPE_DO_TOKEN = process.env.SCRAPE_DO_TOKEN;
 
 const SESSION_ID = crypto.randomBytes(8).toString('hex');
 
+// Файли для збору логів під Healthchecks.io
+const ERROR_LOG_PATH = path.resolve(__dirname, 'error.log');
+const SUMMARY_PATH = path.resolve(__dirname, 'summary.txt');
+
 // ==========================================
 // UTILS
 // ==========================================
@@ -20,6 +24,17 @@ function chunkArray<T>(array: T[], size: number): T[][] {
         chunked.push(array.slice(i, i + size));
     }
     return chunked;
+}
+
+// Функція для логування критичних помилок
+async function logError(context: string, error: any) {
+    const errorMessage = `[${new Date().toISOString()}] ❌ Error in ${context}:\n${error?.stack || error?.message || error}\n\n`;
+    await fs.appendFile(ERROR_LOG_PATH, errorMessage, 'utf-8');
+}
+
+// Функція для накопичення успішних метрик
+async function appendSummary(text: string) {
+    await fs.appendFile(SUMMARY_PATH, text + "\n", 'utf-8');
 }
 
 // ==========================================
@@ -78,7 +93,9 @@ async function scrapeRivneArchive() {
     console.log("==========================================");
 
     if (!SCRAPE_DO_TOKEN) {
-        console.error("❌ Error: SCRAPE_DO_TOKEN is not set. Skipping Rivne scrape.");
+        const errStr = "SCRAPE_DO_TOKEN is not set. Skipping Rivne scrape.";
+        console.error(`❌ Error: ${errStr}`);
+        await logError("Rivne Scraper Init", new Error(errStr));
         return;
     }
 
@@ -87,8 +104,9 @@ async function scrapeRivneArchive() {
         const opysList = parseOpysList(mainHtml, RIVNE_MAIN_URL);
 
         if (opysList.length === 0) {
-            console.error("❌ No opys entries found. Structure might have changed.");
-            return;
+            const errStr = "No opys entries found. Structure might have changed.";
+            console.error(`❌ ${errStr}`);
+            throw new Error(errStr);
         }
 
         const MAX_CONCURRENT = 4;
@@ -117,21 +135,31 @@ async function scrapeRivneArchive() {
 
         const newCases: CaseEntry[] = allCasesNested.flat();
 
-        let oldCasesData = "";
-        try { oldCasesData = await fs.readFile(RIVNE_OUTPUT, 'utf-8'); } catch (e) {}
+        let oldCasesCount = 0;
+        try { 
+            const oldCasesData = await fs.readFile(RIVNE_OUTPUT, 'utf-8'); 
+            const oldCases = JSON.parse(oldCasesData);
+            if (Array.isArray(oldCases)) oldCasesCount = oldCases.length;
+        } catch (e) {}
 
         const newCasesData = JSON.stringify(newCases, null, 2);
 
-        if (oldCasesData === newCasesData) {
-            console.log(`\n🛑 Rivne data is identical (${newCases.length} records). Skipping save.`);
+        if (oldCasesCount === newCasesData.length) {
+            console.log(`\n⚪ Rivne data is identical (${newCases.length} records). Skipping save.`);
+            await appendSummary(`📊 Rivne Archive: No changes. Identical records count: ${newCases.length}`);
         } else {
             await fs.mkdir(path.dirname(RIVNE_OUTPUT), { recursive: true });
             await fs.writeFile(RIVNE_OUTPUT, newCasesData, 'utf-8');
             console.log(`\n🎉 Rivne data saved! ${newCases.length} records to ${RIVNE_OUTPUT}`);
+
+            const diff = newCases.length - oldCasesCount;
+            await appendSummary(`📊 Rivne Archive Updated:\n   - Was: ${oldCasesCount} records\n   - Now: ${newCases.length} records\n   - Diff: ${diff > 0 ? '+' : ''}${diff}`);
         }
 
     } catch (error) {
         console.error("❌ Rivne scraping failed:", error);
+        await logError("Rivne Scraper Core", error);
+        throw error; // Кидаємо виключення далі, щоб крок Actions зафейлився
     }
 }
 
@@ -185,21 +213,31 @@ async function scrapeJewArchive() {
                 };
             });
 
-        let oldData = "";
-        try { oldData = await fs.readFile(JEWARCHIVE_OUTPUT, 'utf-8'); } catch (e) {}
-
+       let oldDataCount = 0;
+        try { 
+            const oldData = await fs.readFile(JEWARCHIVE_OUTPUT, 'utf-8'); 
+            const oldDataJson = JSON.parse(oldData);
+            if (Array.isArray(oldDataJson)) oldDataCount = oldDataJson.length;
+        } catch (e) {}
+        
         const newDataString = JSON.stringify(parsedData, null, 2);
 
-        if (oldData === newDataString) {
-            console.log(`\n🛑 JewArchive data is identical (${parsedData.length} records). Skipping save.`);
+        if (oldDataCount === parsedData.length) {
+            console.log(`\n⚪ JewArchive data is identical (${parsedData.length} records). Skipping save.`);
+            await appendSummary(`📊 JewArchive: No changes. Identical records count: ${parsedData.length}`);
         } else {
             await fs.mkdir(path.dirname(JEWARCHIVE_OUTPUT), { recursive: true });
             await fs.writeFile(JEWARCHIVE_OUTPUT, newDataString, 'utf-8');
             console.log(`\n🎉 JewArchive data saved! ${parsedData.length} records to ${JEWARCHIVE_OUTPUT}`);
+            
+            const diff = parsedData.length - oldDataCount;
+            await appendSummary(`📊 JewArchive Updated:\n   - Was: ${oldDataCount} records\n   - Now: ${parsedData.length} records\n   - Diff: ${diff > 0 ? '+' : ''}${diff}`);
         }
 
     } catch (error) {
         console.error("❌ JewArchive fetching failed:", error);
+        await logError("JewArchive Fetcher", error);
+        throw error;
     }
 }
 
@@ -208,9 +246,18 @@ async function scrapeJewArchive() {
 // ==========================================
 
 async function runAllScrapers() {
-    // Run sequentially so logs don't overlap wildly
-    await scrapeJewArchive();
-    await scrapeRivneArchive();
+    try{
+        // Очищаємо старі тимчасові файли
+        await fs.rm(SUMMARY_PATH, { force: true });
+        await fs.rm(ERROR_LOG_PATH, { force: true });
+        // Run sequentially so logs don't overlap wildly
+        await scrapeJewArchive();
+        await scrapeRivneArchive();
+    } catch (criticalError) {
+        // Якщо хоч один скрапер кинув помилку, завершуємо процес з кодом 1, 
+        // щоб GitHub Actions зрозумів, що сталась аварія.
+        process.exit(1);
+    }
 }
 
 runAllScrapers();

@@ -5,6 +5,10 @@ on:
     - cron: '0 0 1,15 * *'
   workflow_dispatch:
 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   scrape-and-commit:
     runs-on: ubuntu-latest
@@ -20,6 +24,11 @@ jobs:
         with:
           node-version: '25.x' # Updated to match your local Node 25 environment
 
+      # Сигнал у Healthchecks.io про те, що воркфлоу розпочався
+      - name: Signal Healthchecks Start
+        run: |
+          curl -m 10 --retry 5 https://hc-ping.com/${{ secrets.HEALTHCHECKS_ID }}/start
+          
       - name: Install Scraper Dependencies
         working-directory: ./scraper
         run: npm install
@@ -28,7 +37,29 @@ jobs:
         working-directory: ./scraper
         env:
           SCRAPE_DO_TOKEN: ${{ secrets.SCRAPE_DO_TOKEN }}
-        run: npm run start
+        run: |
+          touch error.log
+          npm run start
+
+      # Відправка сигналу УСПІХУ з фінальним текстовим звітом (який створить TS код)
+      - name: Signal Healthchecks Success
+        if: success()
+        run: |
+          if [ -f scraper/summary.txt ]; then
+            curl -m 10 --retry 5 --data-binary @scraper/summary.txt https://hc-ping.com/${{ secrets.HEALTHCHECKS_ID }}
+          else
+            curl -m 10 --retry 5 --data "Scraping completed successfully, but no summary file found." https://hc-ping.com/${{ secrets.HEALTHCHECKS_ID }}
+          fi
+
+      # Відправка сигналу ПОМИЛКИ разом із трейсом з error.log
+      - name: Signal Healthchecks Failure
+        if: failure()
+        run: |
+          if [ -s scraper/error.log ]; then
+            curl -m 10 --retry 5 --data-binary @scraper/error.log https://hc-ping.com/${{ secrets.HEALTHCHECKS_ID }}/fail
+          else
+            curl -m 10 --retry 5 --data "Scraper execution failed on github actions step level." https://hc-ping.com/${{ secrets.HEALTHCHECKS_ID }}/fail
+          fi
 
       - name: Commit and Push changes
         run: |
@@ -40,7 +71,7 @@ jobs:
           git add data/jewarchive.json
           
           if git diff --staged --quiet; then
-            echo "🛑 No changes detected in the data files. Skipping commit."
+            echo "⚪ No changes detected in the data files. Skipping commit."
           else
             git commit -m "Auto-update: Archive data files (Rivne & JewArchive) [skip ci]"
             git push
