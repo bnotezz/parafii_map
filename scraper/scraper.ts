@@ -41,6 +41,24 @@ async function appendSummary(text: string) {
 // 1. RIVNE ARCHIVE SCRAPER (Protected)
 // ==========================================
 
+async function fetchHTML(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    }
+    const body = await response.text();
+    if(body.includes('Just a moment...') || body.includes('зачекайте')) {
+        throw new Error(`Cloudflare challenge detected for ${url}`);
+    }
+    else if(body.includes('Access Denied') || body.includes('403 Forbidden')) {
+        throw new Error(`Access denied for ${url}`);
+    }
+    else if(!body.includes('decision-files-wrapper')) {
+        throw new Error(`No results available for ${url}`);
+    }
+    return body;
+}
+
 // This function now just does ONE job: makes the request. No loops here.
 async function fetchFromScrapeDo(targetUrl: string, render: boolean): Promise<string> {
     const apiUrl = new URL("http://api.scrape.do/");
@@ -50,7 +68,8 @@ async function fetchFromScrapeDo(targetUrl: string, render: boolean): Promise<st
 
     if (render) {
         apiUrl.searchParams.append("render", "true");
-    }
+        apiUrl.searchParams.append("waitUntil", "networkidle2");
+        apiUrl.searchParams.append("blockResources", "false"); // 30 seconds
 
     const response = await fetch(apiUrl.toString());
     if (!response.ok) {
@@ -62,6 +81,15 @@ async function fetchFromScrapeDo(targetUrl: string, render: boolean): Promise<st
 
 async function smartFetchHtml(targetUrl: string, retries = 3): Promise<string> {
     console.log(`\n🌐 Requesting with JS render: ${targetUrl}`);
+
+    //try simple fetch first
+    try {
+        const html = await fetchHTML(targetUrl);
+        console.log(`   ⚡ Success with simple fetch!`);
+        return html;
+    } catch (e: any) {
+        console.log(`   ⚠️ Simple fetch failed (${e.message}). Falling back to Scrape.do...`);
+    }
     
     for (let i = 0; i < retries; i++) {
         try {
