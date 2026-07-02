@@ -70,6 +70,7 @@ async function fetchFromScrapeDo(targetUrl: string, render: boolean): Promise<st
         apiUrl.searchParams.append("render", "true");
         apiUrl.searchParams.append("waitUntil", "networkidle2");
         apiUrl.searchParams.append("blockResources", "false"); // 30 seconds
+    }
 
     const response = await fetch(apiUrl.toString());
     if (!response.ok) {
